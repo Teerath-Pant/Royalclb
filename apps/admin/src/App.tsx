@@ -1,22 +1,20 @@
-import { motion } from 'framer-motion'
-import { useEffect, useState } from 'react'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import AdminLayout from './layouts/AdminLayout'
+import ComingSoon from './pages/ComingSoon'
+import Dashboard from './pages/Dashboard'
+import Login from './pages/Login'
 
 export default function App() {
-  const [status, setStatus] = useState('checking')
-
-  useEffect(() => {
-    fetch('/api/health')
-      .then((res) => res.json())
-      .then((data) => setStatus(data.status))
-      .catch(() => setStatus('unreachable'))
-  }, [])
-
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-950 text-white">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center">
-        <h1 className="text-4xl font-bold">Royalclub Admin</h1>
-        <p className="mt-2 text-slate-400">Server: {status}</p>
-      </motion.div>
-    </main>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route element={<AdminLayout />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="*" element={<ComingSoon />} />
+        </Route>
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
