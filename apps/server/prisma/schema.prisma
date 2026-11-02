@@ -1,0 +1,1968 @@
+generator client {
+  provider        = "prisma-client"
+  output          = "../generated/prisma"
+  previewFeatures = ["relationJoins"]
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model updown_bets {
+  id                    Int                   @id @default(autoincrement())
+  game_id               Int
+  user_id               Int
+  bet_on                updown_bets_bet_on
+  bet_amount            Decimal               @db.Decimal(10, 2)
+  win_amount            Decimal?              @db.Decimal(10, 2)
+  charge                Decimal?              @db.Decimal(10, 2)
+  net_win_amount        Decimal?              @db.Decimal(10, 2)
+  date_time             DateTime              @db.DateTime(0)
+  result_date_time      DateTime?             @db.DateTime(0)
+  status                updown_bets_status    @default(PENDING)
+  updown_games          updown_games          @relation(fields: [game_id], references: [id], onDelete: Cascade, map: "fk_game")
+  meddolic_user_details meddolic_user_details @relation(fields: [user_id], references: [member_id], onDelete: Cascade, map: "fk_user")
+
+  @@index([game_id], map: "fk_game")
+  @@index([user_id], map: "fk_user")
+  @@map("7updown_bets")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model updown_games {
+  id            Int                 @id @default(autoincrement())
+  period_id     String              @db.VarChar(100)
+  interval_min  Decimal             @db.Decimal(10, 2)
+  winning_dice1 Int?                @db.TinyInt
+  winning_dice2 Int?                @db.TinyInt
+  started_at    DateTime            @db.DateTime(0)
+  completed_at  DateTime?           @db.DateTime(0)
+  status        updown_games_status @default(RUNNING)
+  updown_bets   updown_bets[]
+
+  @@map("7updown_games")
+}
+
+model andarBahar {
+  id             Int                @id @default(autoincrement())
+  period         String             @db.VarChar(255)
+  intervalMin    Decimal            @db.Decimal(5, 2)
+  result         andarBahar_result?
+  startedAt      DateTime           @db.DateTime(0)
+  completedAt    DateTime?          @db.DateTime(0)
+  status         andarBahar_status  @default(RUNNING)
+  andarBaharBets andarBaharBets[]
+}
+
+model andarBaharBets {
+  id                    Int                   @id @default(autoincrement())
+  gameId                Int
+  userId                Int
+  betOn                 andarBaharBets_betOn
+  betAmount             Decimal               @db.Decimal(10, 2)
+  winAmount             Decimal               @default(0.00) @db.Decimal(10, 2)
+  charge                Decimal               @default(0.00) @db.Decimal(10, 2)
+  netWinAmount          Decimal               @default(0.00) @db.Decimal(10, 2)
+  dateTime              DateTime              @db.DateTime(0)
+  resultDateTime        DateTime?             @db.DateTime(0)
+  status                andarBaharBets_status @default(PENDING)
+  andarBahar            andarBahar            @relation(fields: [gameId], references: [id], onUpdate: Restrict, map: "fk_andarBahar_andarBaharBets_gameId")
+  meddolic_user_details meddolic_user_details @relation(fields: [userId], references: [member_id], onUpdate: Restrict, map: "fk_users_andarBaharBets_userId")
+
+  @@index([gameId], map: "fk_andarBahar_andarBaharBets_gameId")
+  @@index([userId], map: "fk_users_andarBaharBets_userId")
+}
+
+model animal {
+  id          Int            @id @default(autoincrement())
+  period      String         @db.VarChar(255)
+  intervalMin Decimal        @db.Decimal(5, 2)
+  result      animal_result?
+  startedAt   DateTime       @db.DateTime(0)
+  completedAt DateTime?      @db.DateTime(0)
+  status      animal_status  @default(RUNNING)
+  animalBets  animalBets[]
+}
+
+model animalBets {
+  id                    Int                   @id @default(autoincrement())
+  gameId                Int
+  userId                Int
+  betOn                 animalBets_betOn?
+  betAmount             Decimal               @db.Decimal(10, 2)
+  winAmount             Decimal               @default(0.00) @db.Decimal(10, 2)
+  charge                Decimal               @default(0.00) @db.Decimal(10, 2)
+  netWinAmount          Decimal               @default(0.00) @db.Decimal(10, 2)
+  dateTime              DateTime              @db.DateTime(0)
+  resultDateTime        DateTime?             @db.DateTime(0)
+  status                animalBets_status     @default(PENDING)
+  animal                animal                @relation(fields: [gameId], references: [id], onUpdate: Restrict, map: "fk_animal_animalBets_gameId")
+  meddolic_user_details meddolic_user_details @relation(fields: [userId], references: [member_id], onUpdate: Restrict, map: "fk_users_animalBets_userId")
+
+  @@index([userId], map: "fk_users_winGoBets_userId")
+  @@index([gameId], map: "fk_winGo_winGoBets_gameId")
+}
+
+model aviator {
+  id             Int              @id @default(autoincrement())
+  maxFly         Decimal          @db.Decimal(10, 2)
+  maxPossibleFly Decimal          @db.Decimal(10, 2)
+  bucketAmount   Decimal          @db.Decimal(10, 2)
+  totalBet       Decimal          @db.Decimal(10, 2)
+  status         aviator_status   @default(BETTING)
+  outcome        aviator_outcome?
+  createdAt      DateTime         @db.DateTime(0)
+  flyingAt       DateTime?        @db.DateTime(0)
+  endedAt        DateTime?        @db.DateTime(0)
+  aviatorBet     aviatorBet[]
+
+  @@index([createdAt], map: "idx_createdAt")
+  @@index([status], map: "idx_status")
+  @@index([status, createdAt], map: "idx_status_createdAt")
+}
+
+model aviatorBet {
+  id                    Int                   @id @default(autoincrement())
+  gameId                Int
+  userId                Int
+  betAmount             Decimal               @db.Decimal(10, 2)
+  side                  aviatorBet_side
+  cashoutMultiplier     Decimal?              @db.Decimal(10, 2)
+  winAmount             Decimal               @default(0.00) @db.Decimal(10, 2)
+  tax                   Decimal               @default(0.00) @db.Decimal(10, 2)
+  netAmount             Decimal               @default(0.00) @db.Decimal(10, 2)
+  status                aviatorBet_status     @default(PENDING)
+  createdAt             DateTime              @db.DateTime(0)
+  resultAt              DateTime?             @db.DateTime(0)
+  aviator               aviator               @relation(fields: [gameId], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "fk_bet_game")
+  meddolic_user_details meddolic_user_details @relation(fields: [userId], references: [member_id], onUpdate: Restrict, map: "fk_bet_user")
+
+  @@unique([userId, gameId, side], map: "uq_user_game_side")
+  @@index([gameId], map: "idx_gameId")
+  @@index([gameId, status], map: "idx_gameId_status")
+  @@index([userId, gameId], map: "idx_userId_gameId")
+}
+
+model aviatorSettings {
+  id     Int     @id @default(1)
+  bucket Decimal @db.Decimal(10, 2)
+}
+
+model carRoulette {
+  id             Int                 @id @default(autoincrement())
+  periodId       String
+  interval       Decimal             @db.Decimal(5, 2)
+  result         carRoulette_result?
+  status         carRoulette_status  @default(RUNNING)
+  createdAt      DateTime            @db.DateTime(0)
+  calculatingAt  DateTime?           @db.DateTime(0)
+  completedAt    DateTime?           @db.DateTime(0)
+  carRouletteBet carRouletteBet[]
+
+  @@index([createdAt], map: "idx_createdAt")
+  @@index([interval], map: "idx_interval")
+  @@index([interval, status], map: "idx_interval_status")
+}
+
+model carRouletteBet {
+  id                    Int                    @id @default(autoincrement())
+  gameId                Int
+  userId                Int
+  betType               carRouletteBet_betType
+  betAmount             Decimal                @db.Decimal(10, 2)
+  winAmount             Decimal                @default(0.00) @db.Decimal(10, 2)
+  tax                   Decimal                @default(0.00) @db.Decimal(10, 2)
+  netAmount             Decimal                @default(0.00) @db.Decimal(10, 2)
+  status                carRouletteBet_status  @default(PENDING)
+  createdAt             DateTime               @db.DateTime(0)
+  resultAt              DateTime?              @db.DateTime(0)
+  carRoulette           carRoulette            @relation(fields: [gameId], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "fk_crb_game")
+  meddolic_user_details meddolic_user_details  @relation(fields: [userId], references: [member_id], onUpdate: Restrict, map: "fk_crb_user")
+
+  @@index([gameId], map: "idx_gameId")
+  @@index([gameId, status], map: "idx_gameId_status")
+  @@index([userId], map: "idx_userId")
+}
+
+model chickenRoadBet {
+  id                    Int                       @id @default(autoincrement())
+  userId                Int
+  betAmount             Decimal                   @db.Decimal(10, 2)
+  difficulty            chickenRoadBet_difficulty
+  cashoutMultiplier     Decimal?                  @db.Decimal(10, 2)
+  finalMultiplier       Decimal?                  @db.Decimal(10, 2)
+  winAmount             Decimal                   @default(0.00) @db.Decimal(10, 2)
+  tax                   Decimal                   @default(0.00) @db.Decimal(10, 2)
+  netAmount             Decimal                   @default(0.00) @db.Decimal(10, 2)
+  stepsReached          Int                       @default(0)
+  status                chickenRoadBet_status     @default(PENDING)
+  serverSeed            String                    @db.VarChar(255)
+  serverSeedHash        String                    @db.VarChar(255)
+  clientSeed            String                    @db.VarChar(255)
+  nonce                 Int                       @default(0)
+  serverSeedRevealed    Boolean                   @default(false)
+  version               Int                       @default(0)
+  createdAt             DateTime                  @db.DateTime(0)
+  cashedOutAt           DateTime?                 @db.DateTime(0)
+  meddolic_user_details meddolic_user_details     @relation(fields: [userId], references: [member_id], onUpdate: Restrict, map: "fk_chickenroadbet_user")
+
+  @@index([createdAt], map: "idx_createdAt")
+  @@index([userId], map: "idx_userId")
+}
+
+model countries {
+  id        Int     @id @default(autoincrement()) @db.UnsignedInt
+  iso       String  @db.Char(2)
+  name      String  @db.VarChar(80)
+  nicename  String  @db.VarChar(80)
+  iso3      String? @db.Char(3)
+  numcode   Int?    @db.SmallInt
+  phonecode Int
+}
+
+model cryptoPriceHistory {
+  id        Int      @id @default(autoincrement())
+  price     Decimal  @db.Decimal(18, 2)
+  createdAt DateTime @db.DateTime(0)
+}
+
+model cryptoTrade {
+  id              Int                 @id @default(autoincrement())
+  period          String              @db.VarChar(255)
+  intervalMin     Decimal             @db.Decimal(5, 2)
+  lastPrice       Decimal?            @db.Decimal(18, 2)
+  currentPrice    Decimal?            @db.Decimal(18, 2)
+  result          cryptoTrade_result?
+  startedAt       DateTime            @db.DateTime(0)
+  completedAt     DateTime?           @db.DateTime(0)
+  status          cryptoTrade_status  @default(RUNNING)
+  cryptoTradeBets cryptoTradeBets[]
+}
+
+model cryptoTradeBets {
+  id                    Int                    @id @default(autoincrement())
+  gameId                Int
+  userId                Int
+  betOn                 cryptoTradeBets_betOn?
+  betAmount             Decimal                @db.Decimal(10, 2)
+  winAmount             Decimal                @default(0.00) @db.Decimal(10, 2)
+  charge                Decimal                @default(0.00) @db.Decimal(10, 2)
+  netWinAmount          Decimal                @default(0.00) @db.Decimal(10, 2)
+  dateTime              DateTime               @db.DateTime(0)
+  resultDateTime        DateTime?              @db.DateTime(0)
+  status                cryptoTradeBets_status @default(PENDING)
+  cryptoTrade           cryptoTrade            @relation(fields: [gameId], references: [id], onUpdate: Restrict, map: "fk_cryptoTrade_cryptoTradeBets_gameId")
+  meddolic_user_details meddolic_user_details  @relation(fields: [userId], references: [member_id], onUpdate: Restrict, map: "fk_users_cryptoTradeBets_userId")
+
+  @@index([userId], map: "fk_users_winGoBets_userId")
+  @@index([gameId], map: "fk_winGo_winGoBets_gameId")
+}
+
+model dailyFundRoi {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  totalWallet Decimal  @db.Decimal(10, 2)
+  roiPercent  Decimal  @db.Decimal(5, 2)
+  roi         Decimal  @db.Decimal(10, 2)
+  createdAt   DateTime @db.DateTime(0)
+}
+
+model dragonTiger {
+  id             Int                 @id @default(autoincrement())
+  periodId       String
+  interval       Decimal             @db.Decimal(5, 2)
+  result         dragonTiger_result?
+  status         dragonTiger_status  @default(RUNNING)
+  createdAt      DateTime            @db.DateTime(0)
+  calculatingAt  DateTime?           @db.DateTime(0)
+  completedAt    DateTime?           @db.DateTime(0)
+  dragonTigerBet dragonTigerBet[]
+
+  @@index([createdAt], map: "idx_createdAt")
+  @@index([interval], map: "idx_interval")
+  @@index([interval, status], map: "idx_interval_status")
+}
+
+model dragonTigerBet {
+  id                    Int                    @id @default(autoincrement())
+  gameId                Int
+  userId                Int
+  betType               dragonTigerBet_betType
+  betAmount             Decimal                @db.Decimal(10, 2)
+  winAmount             Decimal                @default(0.00) @db.Decimal(10, 2)
+  tax                   Decimal                @default(0.00) @db.Decimal(10, 2)
+  netAmount             Decimal                @default(0.00) @db.Decimal(10, 2)
+  status                dragonTigerBet_status  @default(PENDING)
+  createdAt             DateTime               @db.DateTime(0)
+  resultAt              DateTime?              @db.DateTime(0)
+  dragonTiger           dragonTiger            @relation(fields: [gameId], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "fk_dtb_game")
+  meddolic_user_details meddolic_user_details  @relation(fields: [userId], references: [member_id], onUpdate: Restrict, map: "fk_dtb_user")
+
+  @@index([gameId], map: "idx_gameId")
+  @@index([gameId, status], map: "idx_gameId_status")
+  @@index([userId], map: "idx_userId")
+  @@index([userId, createdAt], map: "idx_userId_createdAt")
+}
+
+model forexPriceHistory {
+  id        Int      @id @default(autoincrement())
+  price     Decimal  @db.Decimal(20, 6)
+  createdAt DateTime @db.DateTime(0)
+}
+
+model forexTrade {
+  id             Int                @id @default(autoincrement())
+  period         String             @db.VarChar(255)
+  intervalMin    Decimal            @db.Decimal(5, 2)
+  lastPrice      Decimal?           @db.Decimal(20, 6)
+  currentPrice   Decimal?           @db.Decimal(20, 6)
+  result         forexTrade_result?
+  startedAt      DateTime           @db.DateTime(0)
+  completedAt    DateTime?          @db.DateTime(0)
+  status         forexTrade_status  @default(RUNNING)
+  forexTradeBets forexTradeBets[]
+}
+
+model forexTradeBets {
+  id                    Int                   @id @default(autoincrement())
+  gameId                Int
+  userId                Int
+  betOn                 forexTradeBets_betOn?
+  betAmount             Decimal               @db.Decimal(10, 2)
+  winAmount             Decimal               @default(0.00) @db.Decimal(10, 2)
+  charge                Decimal               @default(0.00) @db.Decimal(10, 2)
+  netWinAmount          Decimal               @default(0.00) @db.Decimal(10, 2)
+  dateTime              DateTime              @db.DateTime(0)
+  resultDateTime        DateTime?             @db.DateTime(0)
+  status                forexTradeBets_status @default(PENDING)
+  forexTrade            forexTrade            @relation(fields: [gameId], references: [id], onUpdate: Restrict, map: "fk_forexTrade_forexTradeBets_gameId")
+  meddolic_user_details meddolic_user_details @relation(fields: [userId], references: [member_id], onUpdate: Restrict, map: "fk_users_forexTradeBets_userId")
+
+  @@index([gameId], map: "fk_forexTrade_forexTradeBets_gameId")
+  @@index([userId], map: "fk_users_forexTradeBets_userId")
+}
+
+model fundSettings {
+  id                   Int      @id @default(1)
+  minRechargeInr       Decimal  @db.Decimal(10, 2)
+  minRechargeUsd       Decimal  @db.Decimal(10, 2)
+  minWithdrawInr       Decimal  @db.Decimal(10, 2)
+  maxWithdrawInr       Decimal  @db.Decimal(10, 2)
+  minWithdrawUsd       Decimal  @db.Decimal(10, 2)
+  maxWithdrawUsd       Decimal  @db.Decimal(10, 2)
+  withdrawCharge       Decimal  @db.Decimal(5, 2)
+  maxWithdrawalsPerDay Int
+  minP2P               Decimal  @db.Decimal(10, 2)
+  maxP2P               Decimal  @db.Decimal(10, 2)
+  p2pCharge            Decimal  @db.Decimal(5, 2)
+  platformCharge       Decimal  @db.Decimal(5, 2)
+  usdToInrRate         Decimal  @db.Decimal(10, 2)
+  createdAt            DateTime @default(now()) @db.Timestamp(0)
+  updatedAt            DateTime @default(now()) @db.Timestamp(0)
+}
+
+model fundTransfers {
+  id                                                                    Int                   @id @default(autoincrement())
+  senderId                                                              Int
+  receiverId                                                            Int
+  amount                                                                Decimal               @db.Decimal(10, 2)
+  charge                                                                Decimal               @db.Decimal(10, 2)
+  netAmount                                                             Decimal               @db.Decimal(10, 2)
+  dateTime                                                              DateTime              @db.DateTime(0)
+  meddolic_user_details_fundTransfers_receiverIdTomeddolic_user_details meddolic_user_details @relation("fundTransfers_receiverIdTomeddolic_user_details", fields: [receiverId], references: [member_id], onDelete: Cascade, map: "fk_users_fundTransfers_receiverId")
+  meddolic_user_details_fundTransfers_senderIdTomeddolic_user_details   meddolic_user_details @relation("fundTransfers_senderIdTomeddolic_user_details", fields: [senderId], references: [member_id], onDelete: Cascade, map: "fk_users_fundTransfers_senderId")
+
+  @@index([receiverId], map: "fk_users_fundTransfers_receiverId")
+  @@index([senderId], map: "fk_users_fundTransfers_senderId")
+}
+
+model gameSettings {
+  id           Int               @id @default(autoincrement())
+  interval     Decimal           @db.Decimal(5, 2)
+  mode         String            @db.VarChar(255)
+  game         gameSettings_game
+  nextPeriodId BigInt
+
+  @@unique([interval, game], map: "interval")
+}
+
+model giftCode {
+  id            Int             @id @default(autoincrement())
+  code          String          @unique(map: "uq_giftcode_code") @db.VarChar(64)
+  amount        Decimal         @db.Decimal(10, 2)
+  maxClaims     Int
+  claimedCount  Int             @default(0)
+  expiresAt     DateTime        @db.DateTime(0)
+  status        giftCode_status @default(ACTIVE)
+  createdAt     DateTime        @db.DateTime(0)
+  giftCodeClaim giftCodeClaim[]
+
+  @@index([code], map: "idx_giftcode_code")
+  @@index([status, expiresAt], map: "idx_giftcode_status_expires")
+}
+
+model giftCodeClaim {
+  id                    Int                   @id @default(autoincrement())
+  giftCodeId            Int
+  userId                Int
+  claimedAt             DateTime              @db.DateTime(0)
+  giftCode              giftCode              @relation(fields: [giftCodeId], references: [id], onUpdate: Restrict, map: "fk_claim_giftcode")
+  meddolic_user_details meddolic_user_details @relation(fields: [userId], references: [member_id], onUpdate: Restrict, map: "fk_claim_user")
+
+  @@unique([giftCodeId, userId], map: "uq_giftcode_user")
+  @@index([giftCodeId], map: "idx_claim_giftcode")
+  @@index([userId], map: "idx_claim_user")
+}
+
+model headTail {
+  id           Int              @id @default(autoincrement())
+  period       String           @db.VarChar(255)
+  intervalMin  Decimal          @db.Decimal(5, 2)
+  result       headTail_result?
+  startedAt    DateTime         @db.DateTime(0)
+  completedAt  DateTime?        @db.DateTime(0)
+  status       headTail_status  @default(RUNNING)
+  headTailBets headTailBets[]
+}
+
+model headTailBets {
+  id                    Int                   @id @default(autoincrement())
+  gameId                Int
+  userId                Int
+  betOn                 headTailBets_betOn
+  betAmount             Decimal               @db.Decimal(10, 2)
+  winAmount             Decimal               @default(0.00) @db.Decimal(10, 2)
+  charge                Decimal               @default(0.00) @db.Decimal(10, 2)
+  netWinAmount          Decimal               @default(0.00) @db.Decimal(10, 2)
+  dateTime              DateTime              @db.DateTime(0)
+  resultDateTime        DateTime?             @db.DateTime(0)
+  status                headTailBets_status   @default(PENDING)
+  headTail              headTail              @relation(fields: [gameId], references: [id], onUpdate: Restrict, map: "fk_headTail_headTailBets_gameId")
+  meddolic_user_details meddolic_user_details @relation(fields: [userId], references: [member_id], onUpdate: Restrict, map: "fk_users_headTailBets_userId")
+
+  @@index([gameId], map: "fk_headTail_headTailBets_gameId")
+  @@index([userId], map: "fk_users_headTailBets_userId")
+}
+
+model leadership_achiever_list {
+  id             Int      @id @default(autoincrement())
+  user_id        Int
+  total_direct   Int
+  valid_direct   Int
+  total_recharge Decimal  @db.Decimal(10, 2)
+  date_time      DateTime @db.DateTime(0)
+}
+
+model leadership_pins {
+  id          Int     @id @default(autoincrement())
+  name        String  @db.VarChar(100)
+  reward      Decimal @db.Decimal(10, 2)
+  pin_need    Int
+  direct_need Int
+  team_need   Int
+  duration    Int     @default(0)
+}
+
+model links {
+  id   Int    @id @default(autoincrement())
+  name String @unique(map: "name") @db.VarChar(255)
+  link String @db.Text
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model lottery_spin_bets {
+  id                    Int                   @id @default(autoincrement())
+  game_id               Int
+  member_id             Int
+  lottery_token         String                @db.VarChar(20)
+  bet_amount            Decimal               @db.Decimal(10, 2)
+  win_amount            Decimal?              @db.Decimal(10, 2)
+  charge                Decimal?              @db.Decimal(10, 2)
+  net_win_amount        Decimal?              @db.Decimal(10, 2)
+  status                Int                   @default(0) @db.TinyInt
+  date_time             DateTime              @db.DateTime(0)
+  result_date_time      DateTime?             @db.DateTime(0)
+  lottery_spin_summary  lottery_spin_summary  @relation(fields: [game_id], references: [id], onUpdate: Restrict, map: "fk_lottery_spin_id")
+  meddolic_user_details meddolic_user_details @relation(fields: [member_id], references: [member_id], onUpdate: Restrict, map: "fk_user_spin_bets")
+
+  @@index([game_id], map: "fk_lottery_spin_id")
+  @@index([member_id], map: "fk_user_spin_bets")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model lottery_spin_summary {
+  id                Int                 @id @default(autoincrement())
+  period_id         String              @db.VarChar(100)
+  interval_min      Decimal             @db.Decimal(10, 2)
+  winning_lottery   Int?
+  started_at        DateTime            @db.DateTime(0)
+  completed_at      DateTime?           @db.DateTime(0)
+  status            Int                 @default(1) @db.TinyInt
+  lottery_spin_bets lottery_spin_bets[]
+}
+
+model lucky100 {
+  id           Int                   @id @default(autoincrement())
+  period       String                @db.VarChar(255)
+  intervalMin  Decimal               @db.Decimal(5, 2)
+  winNumber    Int?                  @db.TinyInt
+  winEvenOdd   lucky100_winEvenOdd?
+  winBigSmall  lucky100_winBigSmall?
+  startedAt    DateTime              @db.DateTime(0)
+  completedAt  DateTime?             @db.DateTime(0)
+  status       lucky100_status       @default(RUNNING)
+  lucky100Bets lucky100Bets[]
+}
+
+model lucky100Bets {
+  id                    Int                    @id @default(autoincrement())
+  gameId                Int
+  userId                Int
+  number                Int?                   @db.TinyInt
+  evenOdd               lucky100Bets_evenOdd?
+  bigSmall              lucky100Bets_bigSmall?
+  betAmount             Decimal                @db.Decimal(10, 2)
+  winAmount             Decimal                @default(0.00) @db.Decimal(10, 2)
+  charge                Decimal                @default(0.00) @db.Decimal(10, 2)
+  netWinAmount          Decimal                @default(0.00) @db.Decimal(10, 2)
+  dateTime              DateTime               @db.DateTime(0)
+  resultDateTime        DateTime?              @db.DateTime(0)
+  status                lucky100Bets_status    @default(PENDING)
+  lucky100              lucky100               @relation(fields: [gameId], references: [id], onDelete: Cascade, map: "fk_lucky100_lucky100Bets_gameId")
+  meddolic_user_details meddolic_user_details  @relation(fields: [userId], references: [member_id], onDelete: Cascade, map: "fk_users_lucky100Bets_userId")
+
+  @@index([gameId], map: "fk_lucky100_lucky100Bets_gameId")
+  @@index([userId], map: "fk_users_lucky100Bets_userId")
+}
+
+model matching_carry {
+  id               Int      @id @default(autoincrement())
+  user_id          Int
+  strong_leg_carry Decimal  @db.Decimal(10, 2)
+  weak_leg_carry   Decimal  @db.Decimal(10, 2)
+  date_time        DateTime @db.DateTime(0)
+}
+
+model matching_income {
+  id                    Int                   @id @default(autoincrement())
+  user_id               Int
+  strong_leg_carry      Decimal               @db.Decimal(10, 2)
+  weak_leg_carry        Decimal               @db.Decimal(10, 2)
+  strong_leg            Decimal               @db.Decimal(10, 2)
+  weak_leg              Decimal               @db.Decimal(10, 2)
+  matching_amount       Decimal               @db.Decimal(10, 2)
+  income                Decimal               @db.Decimal(10, 2)
+  date_time             DateTime              @db.DateTime(0)
+  meddolic_user_details meddolic_user_details @relation(fields: [user_id], references: [member_id], onDelete: Cascade, map: "fk_users_matching_income_user_id")
+
+  @@index([user_id], map: "fk_users_matching_income_user_id")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model meddolic_campus_selection {
+  id              Int
+  name            String   @db.Text
+  gender          String   @db.Text
+  graduation_year Int
+  expected_salary Int
+  dob             DateTime @db.Date
+  applying_as     String   @db.Text
+  whatsapp        Int
+  email           String   @db.Text
+  college_name    String   @db.Text
+  course          String   @db.Text
+  reference       String   @db.Text
+  resume          String   @db.Text
+
+  @@ignore
+}
+
+model meddolic_config_attendence_bonus {
+  id       Int     @id @default(autoincrement())
+  day      Int
+  bet_need Decimal @db.Decimal(10, 2)
+  bonus    Decimal @db.Decimal(10, 2)
+  status   Int     @default(1) @db.TinyInt
+}
+
+model meddolic_config_banner_details {
+  payment_id     Int     @id @default(autoincrement())
+  paymentName    String? @db.Text
+  paymentAddress String? @db.Text
+  paymentImage   String? @db.Text
+  status         Int     @default(1)
+}
+
+model meddolic_config_country_list {
+  country_id   Int    @id @default(autoincrement())
+  countryName  String @db.VarChar(80)
+  country_code Int
+  status       Int    @default(1)
+}
+
+model meddolic_config_currency_list {
+  currency_id    Int     @id @default(autoincrement())
+  currencyName   String? @db.Text
+  currencyCode   String? @db.Text
+  status         Int     @default(1)
+  withdrawStatus Int     @default(0)
+}
+
+model meddolic_config_daily_recharge_bonus {
+  id       Int     @id @default(autoincrement())
+  recharge Decimal @db.Decimal(10, 2)
+  bonus    Decimal @db.Decimal(10, 2)
+}
+
+model meddolic_config_deposit_bonus {
+  id             Int     @id @default(autoincrement())
+  deposit_number Int
+  self_bonus     Decimal @db.Decimal(5, 2)
+  upline_bonus   Decimal @db.Decimal(5, 2)
+  recharge_need  Decimal @db.Decimal(10, 2)
+}
+
+model meddolic_config_first_recharge_bonus {
+  id              Int     @id @default(autoincrement())
+  recharge_amount Decimal @db.Decimal(10, 2)
+  member_bonus    Decimal @db.Decimal(10, 2)
+  agent_bonus     Decimal @db.Decimal(10, 2)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model meddolic_config_game_settings {
+  id           Int     @id @default(autoincrement())
+  interval     Decimal @db.Decimal(10, 2)
+  mode         String  @db.VarChar(50)
+  game         Int     @db.TinyInt
+  nextPeriodId BigInt  @default(100000) @db.UnsignedBigInt
+
+  @@unique([interval, game], map: "unique_interval_game")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model meddolic_config_k3_settings {
+  id             Int     @id @default(autoincrement())
+  interval_min   Decimal @unique(map: "interval_min") @default(1.00) @db.Decimal(10, 2)
+  next_period_id BigInt  @default(100000) @db.UnsignedBigInt
+  mode           String  @default("random") @db.VarChar(100)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model meddolic_config_misc_setting {
+  id                  Int     @id @default(autoincrement())
+  registration_bonus  Decimal @default(21.00) @db.Decimal(10, 2)
+  referralBonusSelf   Decimal @default(0.00) @db.Decimal(10, 2)
+  referralBonusUpline Decimal @db.Decimal(10, 2)
+  referralBonus       Decimal @db.Decimal(5, 2)
+  depositBonus        Decimal @db.Decimal(5, 2)
+  rebateIncome        Decimal @db.Decimal(10, 2)
+  dashboardImage      String? @db.Text
+  imageStatus         Int     @default(0)
+  matching_percent    Decimal @default(10.00) @db.Decimal(5, 2)
+  minBetAmount        Decimal @default(10.00) @db.Decimal(10, 2)
+}
+
+model meddolic_config_news_list {
+  newsId    Int      @id @default(autoincrement())
+  news      String   @db.Text
+  addDate   DateTime @db.DateTime(0)
+  newStatus Int      @default(1)
+}
+
+model meddolic_config_package_type {
+  packageId     Int     @id @default(autoincrement())
+  roiPercent    Decimal @default(0.00) @db.Decimal(11, 2)
+  packagePrice  Int
+  packageName   String  @db.Text
+  Income        Decimal @default(0.00) @db.Decimal(10, 2)
+  packageStatus Int     @default(1)
+  monthlyIncome Decimal @default(0.00) @db.Decimal(10, 2)
+  cappingLimit  Int
+  roiMonths     Int
+  business      Int
+  durationWeeks Int
+}
+
+model meddolic_config_payment_details {
+  payment_id     Int     @id @default(autoincrement())
+  paymentName    String? @db.Text
+  paymentAddress String? @db.Text
+  paymentImage   String? @db.Text
+  status         Int     @default(1)
+}
+
+model meddolic_config_referral_level_bonus {
+  id            Int     @id @default(autoincrement())
+  level         Int     @db.TinyInt
+  bonus_percent Decimal @db.Decimal(5, 2)
+}
+
+model meddolic_config_rescue_bonus {
+  id         Int     @id @default(autoincrement())
+  total_loss Decimal @db.Decimal(10, 2)
+  bonus      Decimal @db.Decimal(10, 2)
+}
+
+model meddolic_config_salary_bonus {
+  id                  Int     @id @default(autoincrement())
+  daily_active_member Int
+  salary              Decimal @db.Decimal(10, 2)
+  status              Int     @default(1) @db.TinyInt
+}
+
+model meddolic_config_salary_bonus_100 {
+  id                  Int     @id @default(autoincrement())
+  daily_active_member Int
+  total_recharge      Decimal @db.Decimal(10, 2)
+  salary              Decimal @db.Decimal(10, 2)
+  status              Int     @default(1) @db.TinyInt
+}
+
+model meddolic_config_salary_bonus_50 {
+  id                  Int     @id @default(autoincrement())
+  daily_active_member Int
+  total_recharge      Decimal @db.Decimal(10, 2)
+  salary              Decimal @db.Decimal(10, 2)
+  status              Int     @default(1) @db.TinyInt
+}
+
+model meddolic_config_self_deposit_bonus {
+  id          Int     @id @default(autoincrement())
+  start       Decimal @db.Decimal(10, 2)
+  end         Decimal @db.Decimal(10, 2)
+  bonus       Decimal @db.Decimal(10, 2)
+  agent_bonus Decimal @db.Decimal(10, 2)
+  status      Int     @default(1) @db.TinyInt
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model meddolic_config_spin_wheel_setting {
+  id             Int     @id @default(autoincrement())
+  bucket         Decimal @default(0.00) @db.Decimal(10, 2)
+  mode           String  @default("auto") @db.VarChar(20)
+  interval_min   Boolean
+  next_period_id String  @default("1000000") @db.VarChar(100)
+}
+
+model meddolic_config_support_priority {
+  priorityId     Int     @id @default(autoincrement())
+  priorityName   String? @db.Text
+  priorityStatus Int     @default(1)
+}
+
+model meddolic_config_support_subject {
+  subjectId     Int     @id @default(autoincrement())
+  subjectName   String? @db.Text
+  subjectStatus Int     @default(1)
+}
+
+model meddolic_config_trade_commission {
+  id                 Int     @id @default(autoincrement())
+  level              Int
+  commission_percent Decimal @db.Decimal(5, 2)
+  status             Int     @default(1) @db.TinyInt
+}
+
+model meddolic_config_vip {
+  id               Int     @id @default(autoincrement())
+  level            Boolean
+  exp_need         BigInt
+  maintenance_need BigInt
+  level_up_reward  Int
+  monthly_reward   Int
+  rebate_rate      Decimal @db.Decimal(5, 2)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model meddolic_config_wallet_statement_type {
+  wallet_statement_id Int    @id @default(autoincrement())
+  statement_type      String @db.Text
+  wallet_remark       String @db.Text
+  statementType       Int    @default(1)
+}
+
+model meddolic_config_winning_streak_bonus {
+  id            Int     @id @default(autoincrement())
+  streak_count  Boolean
+  bonus         Decimal @db.Decimal(10, 2)
+  bonus_percent Decimal @db.Decimal(5, 2)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model meddolic_game_k3_bets {
+  id                       Int                      @id @default(autoincrement()) @db.UnsignedInt
+  session_id               Int
+  member_id                Int                      @db.UnsignedInt
+  number                   Int?                     @db.TinyInt
+  big_small                Int?                     @db.TinyInt
+  odd_even                 Int?                     @db.TinyInt
+  identical_2              String?                  @db.VarChar(10)
+  different_2              String?                  @db.VarChar(20)
+  identical_3              String?                  @db.VarChar(10)
+  any_identical_3          Int?                     @db.TinyInt
+  different_3              String?                  @db.VarChar(20)
+  any_consecutive_3        Int?                     @db.TinyInt
+  bet_amount               Decimal                  @db.Decimal(10, 2)
+  win_amount               Decimal?                 @db.Decimal(10, 2)
+  charge                   Decimal?                 @db.Decimal(10, 2)
+  net_win_amount           Decimal?                 @db.Decimal(10, 2)
+  status                   Int                      @default(0) @db.TinyInt
+  date_time                DateTime                 @db.DateTime(0)
+  result_date_time         DateTime?                @db.DateTime(0)
+  meddolic_game_k3_summary meddolic_game_k3_summary @relation(fields: [session_id], references: [id], onUpdate: Restrict, map: "fk_k3_game_id")
+
+  @@index([session_id], map: "fk_k3_game_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model meddolic_game_k3_summary {
+  id                    Int                     @id @default(autoincrement())
+  game_id               String                  @db.VarChar(100)
+  interval_min          Decimal                 @db.Decimal(10, 2)
+  winning_dice1         Int?                    @db.TinyInt
+  winning_dice2         Int?                    @db.TinyInt
+  winning_dice3         Int?                    @db.TinyInt
+  started_at            DateTime                @db.DateTime(0)
+  completed_at          DateTime?               @db.DateTime(0)
+  status                Int                     @default(1) @db.TinyInt
+  meddolic_game_k3_bets meddolic_game_k3_bets[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model meddolic_user_attendence_bonus {
+  id            Int      @id @default(autoincrement())
+  member_id     Int
+  attendence_id Int
+  day           Int      @db.TinyInt
+  bonus         Decimal  @db.Decimal(10, 2)
+  date_time     DateTime @db.DateTime(0)
+  status        Int      @db.TinyInt
+}
+
+model meddolic_user_child_ids {
+  id                                                                             Int                   @id @default(autoincrement())
+  member_id                                                                      Int
+  child_id                                                                       Int
+  level                                                                          Int
+  meddolic_user_details_meddolic_user_child_ids_child_idTomeddolic_user_details  meddolic_user_details @relation("meddolic_user_child_ids_child_idTomeddolic_user_details", fields: [child_id], references: [member_id], onDelete: Cascade, map: "fk_users_childs_child_id")
+  meddolic_user_details_meddolic_user_child_ids_member_idTomeddolic_user_details meddolic_user_details @relation("meddolic_user_child_ids_member_idTomeddolic_user_details", fields: [member_id], references: [member_id], onDelete: Cascade, map: "fk_users_childs_member_id")
+
+  @@unique([member_id, child_id, level], map: "member_id")
+  @@index([child_id], map: "fk_users_childs_child_id")
+  @@index([member_id], map: "fk_users_childs_member_id")
+}
+
+model meddolic_user_daily_recharge_bonus {
+  id             Int      @id @default(autoincrement())
+  member_id      Int
+  total_recharge Decimal  @db.Decimal(10, 2)
+  bonus_id       Int
+  bonus          Decimal  @db.Decimal(10, 2)
+  date_time      DateTime @db.DateTime(0)
+  status         Int      @default(1) @db.TinyInt
+}
+
+model meddolic_user_deposit_bonus {
+  id             Int      @id @default(autoincrement())
+  member_id      Int
+  deposit_number Int
+  income_from    Int
+  deposit_amount Decimal  @db.Decimal(10, 2)
+  bonus_id       Int
+  income         Decimal  @db.Decimal(10, 2)
+  date_time      DateTime @db.DateTime(0)
+  status         Int      @default(1) @db.TinyInt
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model meddolic_user_details {
+  member_id                                                                        Int                       @id @default(autoincrement())
+  user_id                                                                          String?                   @db.VarChar(50)
+  twoFactorEnabled                                                                 Int                       @default(0) @map("2fa")
+  uid                                                                              Int?
+  name                                                                             String                    @db.VarChar(255)
+  phone                                                                            String                    @db.VarChar(10)
+  email_id                                                                         String                    @db.VarChar(255)
+  password                                                                         String                    @db.Text
+  sponser_id                                                                       Int?
+  topup_flag                                                                       Int                       @default(0)
+  user_type                                                                        Int                       @default(2)
+  date_time                                                                        DateTime                  @db.DateTime(0)
+  activation_date                                                                  DateTime?                 @db.DateTime(0)
+  account_status                                                                   Int                       @default(1)
+  bank                                                                             String?                   @db.VarChar(255)
+  branch                                                                           String?                   @db.VarChar(255)
+  accountNo                                                                        String?                   @db.VarChar(255)
+  acName                                                                           String?                   @db.VarChar(255)
+  ifsc                                                                             String?                   @db.VarChar(255)
+  upiId                                                                            String?                   @db.VarChar(255)
+  bonusWallet                                                                      Decimal                   @default(0.00) @db.Decimal(10, 2)
+  wallet                                                                           Decimal                   @default(0.00) @db.Decimal(10, 2)
+  fundWallet                                                                       Decimal                   @default(0.00) @db.Decimal(10, 2)
+  safeWallet                                                                       Decimal                   @default(0.00) @db.Decimal(10, 2)
+  safeInterestWallet                                                               Decimal                   @default(0.00) @db.Decimal(10, 2)
+  vip                                                                              Int                       @default(0) @db.TinyInt
+  exp                                                                              Decimal                   @default(0.00) @db.Decimal(22, 2)
+  rebate_rate                                                                      Decimal                   @default(0.00) @db.Decimal(5, 2)
+  attendenceDay                                                                    Int                       @default(0)
+  dueDay1                                                                          Int                       @default(0)
+  dueDay2                                                                          Int                       @default(0)
+  leadershipId                                                                     Int                       @default(-1)
+  countryId                                                                        Int?                      @default(99)
+  updown_bets                                                                      updown_bets[]
+  andarBaharBets                                                                   andarBaharBets[]
+  animalBets                                                                       animalBets[]
+  aviatorBet                                                                       aviatorBet[]
+  carRouletteBet                                                                   carRouletteBet[]
+  chickenRoadBet                                                                   chickenRoadBet[]
+  cryptoTradeBets                                                                  cryptoTradeBets[]
+  dragonTigerBet                                                                   dragonTigerBet[]
+  forexTradeBets                                                                   forexTradeBets[]
+  fundTransfers_fundTransfers_receiverIdTomeddolic_user_details                    fundTransfers[]           @relation("fundTransfers_receiverIdTomeddolic_user_details")
+  fundTransfers_fundTransfers_senderIdTomeddolic_user_details                      fundTransfers[]           @relation("fundTransfers_senderIdTomeddolic_user_details")
+  giftCodeClaim                                                                    giftCodeClaim[]
+  headTailBets                                                                     headTailBets[]
+  lottery_spin_bets                                                                lottery_spin_bets[]
+  lucky100Bets                                                                     lucky100Bets[]
+  matching_income                                                                  matching_income[]
+  meddolic_user_child_ids_meddolic_user_child_ids_child_idTomeddolic_user_details  meddolic_user_child_ids[] @relation("meddolic_user_child_ids_child_idTomeddolic_user_details")
+  meddolic_user_child_ids_meddolic_user_child_ids_member_idTomeddolic_user_details meddolic_user_child_ids[] @relation("meddolic_user_child_ids_member_idTomeddolic_user_details")
+  meddolic_user_details                                                            meddolic_user_details?    @relation("meddolic_user_detailsTomeddolic_user_details", fields: [sponser_id], references: [member_id], onDelete: Restrict, onUpdate: Restrict, map: "fk_users_users_sponser_id")
+  other_meddolic_user_details                                                      meddolic_user_details[]   @relation("meddolic_user_detailsTomeddolic_user_details")
+  recharges                                                                        recharges[]
+  reward                                                                           reward[]
+  reward_summary                                                                   reward_summary[]
+  safeInterestLogs                                                                 safeInterestLogs[]
+  safeTransactions                                                                 safeTransactions[]
+  sessions                                                                         sessions[]
+  trxBets                                                                          trxBets[]
+  usdDepositBonus                                                                  usdDepositBonus[]
+  winGoBets                                                                        winGoBets[]
+  withdrawalMethods                                                                withdrawalMethods[]
+  withdrawalRequests                                                               withdrawalRequests[]
+
+  @@index([sponser_id], map: "fk_users_users_sponser_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model meddolic_user_exp_details {
+  id        Int      @id @default(autoincrement())
+  member_id Int
+  exp       Decimal  @db.Decimal(10, 2)
+  type      Boolean
+  reason    String   @db.VarChar(255)
+  date_time DateTime @db.DateTime(0)
+  status    Boolean  @default(true)
+}
+
+model meddolic_user_fund_transfer_history {
+  id                 Int       @id @default(autoincrement())
+  sender_member_id   Int
+  receiver_member_id Int
+  amount             Decimal   @default(0.00) @db.Decimal(10, 2)
+  amountPercent      Int
+  netAmount          Decimal   @default(0.00) @db.Decimal(10, 2)
+  date_time          DateTime? @db.DateTime(0)
+  status             Int       @default(1)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model meddolic_user_head_tail_game_bet_details {
+  id               Int      @id @default(autoincrement())
+  sessionId        Int
+  memberId         Int
+  headTailId       Boolean
+  betAmount        Decimal  @db.Decimal(10, 2)
+  winningAmount    Decimal  @db.Decimal(10, 2)
+  charge           Decimal  @db.Decimal(5, 2)
+  netWinningAmount Decimal  @db.Decimal(10, 2)
+  winner           Boolean  @default(false)
+  dateTime         DateTime @db.DateTime(0)
+
+  @@index([sessionId], map: "sessionId")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model meddolic_user_head_tail_game_session_summary {
+  id              Int      @id @default(autoincrement())
+  gameId          String   @db.VarChar(100)
+  interval        Decimal  @db.Decimal(10, 2)
+  winningHeadTail Boolean?
+  dateTime        DateTime @db.DateTime(0)
+  gameStatus      Boolean
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model meddolic_user_income_wallet_transfer {
+  id             Int       @id @default(autoincrement())
+  memberId       Int
+  transferAmount Decimal   @default(0.00) @db.Decimal(10, 2)
+  transferCharge Decimal   @default(0.00) @db.Decimal(10, 2)
+  depositAmount  Decimal   @default(0.00) @db.Decimal(10, 2)
+  transferDate   DateTime? @db.DateTime(0)
+  incomeWallet   Decimal   @default(0.00) @db.Decimal(10, 2)
+  fundWallet     Decimal   @default(0.00) @db.Decimal(10, 2)
+  releaseDate    DateTime? @db.Date
+  releaseStatus  Int       @default(1)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model meddolic_user_invest_purchase_details {
+  tempId         Int       @id @default(autoincrement())
+  memberId       Int
+  loginMemberId  Int
+  name           String?   @db.Text
+  phone          String?   @db.Text
+  emailId        String?   @db.Text
+  packagePrice   Decimal   @default(0.00) @db.Decimal(10, 2)
+  addDate        DateTime? @db.DateTime(0)
+  orderId        String?   @db.Text
+  priceAmount    String?   @db.Text
+  priceCurrency  String?   @db.Text
+  payAmount      String?   @db.Text
+  payCurrency    String?   @db.Text
+  amountReceived String?   @db.Text
+  paymentId      Int?
+  paymentStatus  String?   @db.Text
+  payAddress     String?   @db.Text
+  createdTime    DateTime? @db.DateTime(0)
+  updateTime     DateTime? @db.DateTime(0)
+  purchaseId     String?   @db.Text
+  actionTaken    Int       @default(0)
+  actionType     Int       @default(1)
+  nextPayOpen    Int       @default(0)
+}
+
+model meddolic_user_level_bonus {
+  id              Int      @id @default(autoincrement())
+  member_id       Int
+  child_id        Int
+  level           Int
+  recharge_amount Decimal  @db.Decimal(10, 2)
+  bonus_percent   Decimal  @db.Decimal(5, 2)
+  bonus           Decimal  @db.Decimal(10, 2)
+  date_time       DateTime @db.DateTime(0)
+  status          Int      @default(1) @db.TinyInt
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model meddolic_user_otp_history {
+  id              Int      @id @default(autoincrement())
+  phone           String   @db.VarChar(20)
+  otp             String   @db.VarChar(10)
+  date_time       DateTime @db.DateTime(0)
+  expiration_time DateTime @db.DateTime(0)
+  status          Int      @default(1) @db.TinyInt
+  type            Boolean  @default(true)
+}
+
+model meddolic_user_rebate_income {
+  id             Int      @id @default(autoincrement())
+  member_id      Int
+  total_bet      Decimal  @db.Decimal(10, 2)
+  rebate_percent Decimal  @db.Decimal(5, 2)
+  rebate_income  Decimal  @db.Decimal(10, 2)
+  date_time      DateTime @db.DateTime(0)
+  release_status Int      @default(1) @db.TinyInt
+}
+
+model meddolic_user_referral_bonus {
+  id              Int      @id @default(autoincrement())
+  member_id       Int
+  income_from     Int
+  recharge_amount Decimal  @db.Decimal(10, 2)
+  bonus_percent   Decimal  @db.Decimal(5, 2)
+  bonus           Decimal  @db.Decimal(10, 2)
+  date_time       DateTime @db.DateTime(0)
+  status          Int      @default(1) @db.TinyInt
+}
+
+model meddolic_user_registration_bonus {
+  id        Int      @id @default(autoincrement())
+  member_id Int
+  bonus     Decimal  @db.Decimal(10, 2)
+  date_time DateTime @db.DateTime(0)
+  status    Int      @default(1) @db.TinyInt
+}
+
+model meddolic_user_rescue_bonus {
+  id         Int      @id @default(autoincrement())
+  member_id  Int
+  bonus_id   Int
+  total_loss Decimal  @db.Decimal(10, 2)
+  bonus      Decimal  @db.Decimal(10, 2)
+  date_time  DateTime @db.DateTime(0)
+  status     Int      @default(1) @db.TinyInt
+}
+
+model meddolic_user_salary_bonus {
+  id             Int       @id @default(autoincrement())
+  member_id      Int
+  salary_id      Int
+  salary         Decimal   @db.Decimal(10, 2)
+  date_time      DateTime  @db.DateTime(0)
+  release_date   DateTime? @db.DateTime(0)
+  release_status Int       @default(0) @db.TinyInt
+  status         Int       @default(1) @db.TinyInt
+}
+
+model meddolic_user_salary_bonus_100 {
+  id             Int       @id @default(autoincrement())
+  member_id      Int
+  salary_id      Int
+  salary         Decimal   @db.Decimal(10, 2)
+  date_time      DateTime  @db.DateTime(0)
+  release_date   DateTime? @db.DateTime(0)
+  release_status Int       @default(0) @db.TinyInt
+  status         Int       @default(1) @db.TinyInt
+}
+
+model meddolic_user_salary_bonus_50 {
+  id             Int       @id @default(autoincrement())
+  member_id      Int
+  salary_id      Int
+  salary         Decimal   @db.Decimal(10, 2)
+  date_time      DateTime  @db.DateTime(0)
+  release_date   DateTime? @db.DateTime(0)
+  release_status Int       @default(0) @db.TinyInt
+  status         Int       @default(1) @db.TinyInt
+}
+
+model meddolic_user_self_deposit_bonus {
+  id             Int      @id @default(autoincrement())
+  member_id      Int
+  income_from    Int
+  deposit_amount Decimal  @db.Decimal(10, 2)
+  bonus_id       Int
+  income         Decimal  @db.Decimal(10, 2)
+  date_time      DateTime @db.DateTime(0)
+  status         Int      @default(1) @db.TinyInt
+}
+
+model meddolic_user_spin_history {
+  id             Int      @id @default(autoincrement())
+  member_id      Int
+  winning_amount Decimal  @db.Decimal(10, 2)
+  date_time      DateTime @db.DateTime(0)
+  next_date_time DateTime @db.DateTime(0)
+  status         Int      @default(1) @db.TinyInt
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model meddolic_user_support_ticket {
+  ticketId         Int       @id @default(autoincrement())
+  memberId         Int
+  ticketCode       String?   @db.VarChar(50)
+  subjectId        Int
+  priorityId       Int
+  ticketMessage    String?   @db.Text
+  adminMessage     String?   @db.Text
+  transactionImage String    @db.Text
+  raiseDate        DateTime? @db.DateTime(0)
+  actionDate       DateTime? @db.DateTime(0)
+  ticketStatus     Int       @default(1)
+  actionBy         Int?
+}
+
+model meddolic_user_trade_commission {
+  id                 Int      @id @default(autoincrement())
+  member_id          Int
+  child_id           Int
+  level              Int
+  bet_amount         Decimal  @db.Decimal(10, 2)
+  commission_percent Decimal  @db.Decimal(5, 2)
+  commission         Decimal  @db.Decimal(10, 4)
+  date_time          DateTime @db.DateTime(0)
+  status             Int      @default(1) @db.TinyInt
+}
+
+model meddolic_user_vip_achievers {
+  id          Int      @id @default(autoincrement())
+  member_id   Int
+  current_exp BigInt
+  vip_id      Int
+  date_time   DateTime @db.DateTime(0)
+  status      Boolean  @default(true)
+}
+
+model meddolic_user_vip_level_up_reward {
+  id              Int      @id @default(autoincrement())
+  vip_achiever_id Int
+  member_id       Int
+  reward          Decimal  @db.Decimal(10, 2)
+  date_time       DateTime @db.DateTime(0)
+  status          Boolean  @default(true)
+}
+
+model meddolic_user_vip_monthly_reward_details {
+  id         Int      @id @default(autoincrement())
+  summary_id Int
+  member_id  Int
+  reward     Decimal  @db.Decimal(10, 2)
+  date_time  DateTime @db.DateTime(0)
+  status     Boolean  @default(true)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model meddolic_user_vip_monthly_reward_summary {
+  id               Int      @id @default(autoincrement())
+  vip_achiever_id  Int
+  member_id        Int
+  reward           Decimal  @db.Decimal(10, 2)
+  maintenance_need Decimal  @db.Decimal(10, 2)
+  date_time        DateTime @db.DateTime(0)
+  status           Boolean  @default(true)
+}
+
+model meddolic_user_wallet_address_details {
+  payment_id    Int       @id @default(autoincrement())
+  walletType    String    @db.VarChar(100)
+  member_id     Int
+  walletAddress String?   @db.Text
+  walletQr      String?   @db.VarChar(255)
+  addDate       DateTime? @db.DateTime(0)
+  status        Int       @default(1)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model meddolic_user_wallet_credit_debit_details {
+  id        Int      @id @default(autoincrement())
+  member_id Int
+  amount    Decimal  @db.Decimal(10, 2)
+  note      String   @db.Text
+  type      String   @default("") @db.VarChar(20)
+  wallet    String   @default("bonusWallet") @db.VarChar(50)
+  date_time DateTime @db.DateTime(0)
+}
+
+model meddolic_user_wallet_statement {
+  wallet_st_id        Int       @id @default(autoincrement())
+  member_id           Int
+  wallet_statement_id Int
+  deb_cr              Int
+  amount              Decimal   @default(0.0000) @db.Decimal(15, 4)
+  date_time           DateTime? @db.DateTime(0)
+  trn_id              Int       @default(0)
+}
+
+model meddolic_user_winning_streak_bonus {
+  id        Int      @id @default(autoincrement())
+  member_id Int
+  bonus_id  Int
+  streak    Int
+  bonus     Decimal  @db.Decimal(10, 2)
+  date_time DateTime @db.DateTime(0)
+  status    Int      @default(1)
+}
+
+model monthly_reward_config {
+  id          Int     @id @default(autoincrement())
+  direct_need Int
+  spin_need   Int
+  income      Decimal @db.Decimal(10, 2)
+}
+
+model provablyFairSeed {
+  id             Int       @id @default(autoincrement())
+  serverSeed     String    @db.VarChar(255)
+  serverSeedHash String    @db.VarChar(255)
+  isActive       Boolean   @default(true)
+  createdAt      DateTime  @db.DateTime(0)
+  revealedAt     DateTime? @db.DateTime(0)
+
+  @@index([isActive], map: "idx_isActive")
+}
+
+model recharges {
+  id                    Int                   @id @default(autoincrement())
+  userId                Int
+  originalAmount        Decimal               @db.Decimal(10, 2)
+  amount                Decimal               @db.Decimal(10, 2)
+  utrNo                 String?               @db.VarChar(255)
+  type                  recharges_type
+  remark                String?               @db.VarChar(255)
+  status                recharges_status      @default(PENDING)
+  createdAt             DateTime              @db.DateTime(0)
+  respondedAt           DateTime?             @db.DateTime(0)
+  method                recharges_method
+  actuallyPaid          Decimal?              @db.Decimal(10, 2)
+  paymentId             String?               @db.VarChar(255)
+  orderId               String?               @db.VarChar(100)
+  gatewayStatus         String?               @db.VarChar(100)
+  payAddress            String?               @db.VarChar(255)
+  metadata              String?               @db.LongText
+  meddolic_user_details meddolic_user_details @relation(fields: [userId], references: [member_id], onDelete: Cascade, map: "fk_user_recharges_userId")
+
+  @@index([userId], map: "fk_user_recharges_userId")
+}
+
+model referral_income {
+  id           Int      @id @default(autoincrement())
+  user_id      Int
+  config_id    Int
+  total_direct Int
+  total_spin   Int
+  income       Decimal  @db.Decimal(10, 2)
+  date_time    DateTime @db.DateTime(0)
+}
+
+model referral_income_config {
+  id          Int     @id @default(autoincrement())
+  direct_need Int
+  spin_need   Int
+  income      Decimal @db.Decimal(10, 2)
+}
+
+model reward {
+  id                    Int                   @id @default(autoincrement())
+  summary_id            Int
+  user_id               Int
+  income                Decimal               @db.Decimal(10, 2)
+  date_time             DateTime              @db.DateTime(0)
+  reward_summary        reward_summary        @relation(fields: [summary_id], references: [id], onDelete: Cascade, map: "fk_reward_summary_reward_summary_id")
+  meddolic_user_details meddolic_user_details @relation(fields: [user_id], references: [member_id], onDelete: Cascade, map: "fk_users_reward_user_id")
+
+  @@index([summary_id], map: "fk_reward_summary_reward_summary_id")
+  @@index([user_id], map: "fk_users_reward_user_id")
+}
+
+model reward_summary {
+  id                    Int                   @id @default(autoincrement())
+  user_id               Int
+  direct_team           Int
+  total_team            Int
+  income                Decimal               @db.Decimal(10, 2)
+  duration              Int
+  date_time             DateTime              @db.DateTime(0)
+  status                reward_summary_status
+  reward                reward[]
+  meddolic_user_details meddolic_user_details @relation(fields: [user_id], references: [member_id], onDelete: Cascade, map: "fk_users_reward_summary_user_id")
+
+  @@index([user_id], map: "fk_users_reward_summary_user_id")
+}
+
+model safeInterestLogs {
+  id                    Int                   @id @default(autoincrement()) @db.UnsignedInt
+  userId                Int
+  amount                Decimal               @default(0.00) @db.Decimal(10, 2)
+  walletBalanceAtTime   Decimal               @default(0.00) @db.Decimal(10, 2)
+  date                  DateTime              @db.Date
+  createdAt             DateTime              @db.Timestamp(0)
+  meddolic_user_details meddolic_user_details @relation(fields: [userId], references: [member_id], onDelete: Cascade, map: "fk_safeInterestLogs_userId")
+
+  @@index([userId], map: "userId")
+}
+
+model safeSettings {
+  id                Int      @id @default(autoincrement()) @db.UnsignedInt
+  interestRate      Decimal  @default(1.00) @db.Decimal(5, 2)
+  minDepositAmount  Decimal  @default(10.00) @db.Decimal(10, 2)
+  maxDepositAmount  Decimal  @default(10000.00) @db.Decimal(10, 2)
+  minWithdrawAmount Decimal  @default(10.00) @db.Decimal(10, 2)
+  maxWithdrawAmount Decimal  @default(10000.00) @db.Decimal(10, 2)
+  createdAt         DateTime @db.Timestamp(0)
+}
+
+model safeTransactions {
+  id                    Int                   @id @default(autoincrement()) @db.UnsignedInt
+  userId                Int
+  type                  safeTransactions_type
+  amount                Decimal               @default(0.00) @db.Decimal(10, 2)
+  balanceAfter          Decimal               @default(0.00) @db.Decimal(10, 2)
+  createdAt             DateTime              @db.Timestamp(0)
+  meddolic_user_details meddolic_user_details @relation(fields: [userId], references: [member_id], onDelete: Cascade, map: "fk_safeTransactions_userId")
+
+  @@index([userId], map: "userId")
+}
+
+model sessions {
+  id                    String                @id @db.Char(36)
+  userId                Int
+  expiresAt             DateTime              @db.DateTime(0)
+  createdAt             DateTime              @db.DateTime(0)
+  userAgent             String?               @db.VarChar(255)
+  ipAddress             String?               @db.VarChar(45)
+  meddolic_user_details meddolic_user_details @relation(fields: [userId], references: [member_id], onDelete: Cascade, onUpdate: Restrict, map: "fk_sessions_user")
+
+  @@index([expiresAt], map: "idx_expiresAt")
+  @@index([userId], map: "idx_userId")
+}
+
+model trx {
+  id          Int        @id @default(autoincrement())
+  blockId     Int?
+  period      String     @db.VarChar(255)
+  intervalMin Decimal    @db.Decimal(5, 2)
+  subHash     String?    @db.VarChar(10)
+  winNumber   Int?       @db.TinyInt
+  startedAt   DateTime   @db.DateTime(0)
+  completedAt DateTime?  @db.DateTime(0)
+  status      trx_status @default(RUNNING)
+  trxBlocks   trxBlocks? @relation(fields: [blockId], references: [id], onDelete: Cascade, map: "fk_blocks_trx_block_id")
+  trxBets     trxBets[]
+
+  @@index([blockId], map: "fk_blocks_trx_block_id")
+}
+
+model trxBets {
+  id                    Int                   @id @default(autoincrement())
+  gameId                Int
+  userId                Int
+  number                Int?                  @db.TinyInt
+  color                 trxBets_color?
+  bigSmall              trxBets_bigSmall?
+  betAmount             Decimal               @db.Decimal(10, 2)
+  winAmount             Decimal               @default(0.00) @db.Decimal(10, 2)
+  charge                Decimal               @default(0.00) @db.Decimal(10, 2)
+  netWinAmount          Decimal               @default(0.00) @db.Decimal(10, 2)
+  dateTime              DateTime              @db.DateTime(0)
+  resultDateTime        DateTime?             @db.DateTime(0)
+  status                trxBets_status        @default(PENDING)
+  trx                   trx                   @relation(fields: [gameId], references: [id], onDelete: Cascade, map: "fk_trx_trxBets_gameId")
+  meddolic_user_details meddolic_user_details @relation(fields: [userId], references: [member_id], onDelete: Cascade, map: "fk_users_trxBets_userId")
+
+  @@index([gameId], map: "fk_trx_trxBets_gameId")
+  @@index([userId], map: "fk_users_trxBets_userId")
+}
+
+model trxBlocks {
+  id             Int     @id @default(autoincrement())
+  number         BigInt
+  hash           String  @unique(map: "hash") @db.VarChar(128)
+  size           Int
+  timestamp      BigInt
+  txTrieRoot     String  @db.VarChar(128)
+  parentHash     String  @db.VarChar(128)
+  witnessId      Int
+  witnessAddress String  @db.VarChar(64)
+  nrOfTrx        Int
+  witnessName    String  @db.VarChar(64)
+  version        String  @db.VarChar(10)
+  fee            Decimal @db.Decimal(18, 8)
+  confirmed      Boolean
+  confirmations  Int
+  netUsage       Int
+  energyUsage    BigInt
+  blockReward    Int
+  voteReward     Int
+  revert         Boolean
+  trx            trx[]
+}
+
+model upiIds {
+  id        Int           @id @default(autoincrement())
+  upiId     String        @unique(map: "upiId") @db.VarChar(255)
+  views     Int           @default(0)
+  createdAt DateTime      @db.DateTime(0)
+  status    upiIds_status @default(ENABLE)
+}
+
+model walletAddresses {
+  id        Int                    @id @default(autoincrement())
+  address   String                 @unique(map: "upiId") @db.VarChar(255)
+  views     Int                    @default(0)
+  createdAt DateTime               @db.DateTime(0)
+  status    walletAddresses_status @default(ENABLE)
+}
+
+model wallet_statements {
+  id          Int                           @id @default(autoincrement())
+  user_id     Int
+  txn_id      Int
+  amount      Decimal                       @db.Decimal(12, 4)
+  note        String                        @db.Text
+  type        wallet_statements_type
+  wallet_type wallet_statements_wallet_type
+  date_time   DateTime                      @db.DateTime(0)
+}
+
+model winGo {
+  id          Int          @id @default(autoincrement())
+  period      String       @db.VarChar(255)
+  intervalMin Decimal      @db.Decimal(5, 2)
+  winNumber   Int?         @db.TinyInt
+  startedAt   DateTime     @db.DateTime(0)
+  completedAt DateTime?    @db.DateTime(0)
+  status      winGo_status @default(RUNNING)
+  winGoBets   winGoBets[]
+}
+
+model winGoBets {
+  id                    Int                   @id @default(autoincrement())
+  gameId                Int
+  userId                Int
+  number                Int?                  @db.TinyInt
+  color                 winGoBets_color?
+  bigSmall              winGoBets_bigSmall?
+  betAmount             Decimal               @db.Decimal(10, 2)
+  winAmount             Decimal               @default(0.00) @db.Decimal(10, 2)
+  charge                Decimal               @default(0.00) @db.Decimal(10, 2)
+  netWinAmount          Decimal               @default(0.00) @db.Decimal(10, 2)
+  dateTime              DateTime              @db.DateTime(0)
+  resultDateTime        DateTime?             @db.DateTime(0)
+  status                winGoBets_status      @default(PENDING)
+  meddolic_user_details meddolic_user_details @relation(fields: [userId], references: [member_id], onDelete: Cascade, map: "fk_users_winGoBets_userId")
+  winGo                 winGo                 @relation(fields: [gameId], references: [id], onDelete: Cascade, map: "fk_winGo_winGoBets_gameId")
+
+  @@index([userId], map: "fk_users_winGoBets_userId")
+  @@index([gameId], map: "fk_winGo_winGoBets_gameId")
+}
+
+model withdrawalMethods {
+  id                    Int                    @id @default(autoincrement())
+  userId                Int
+  type                  withdrawalMethods_type
+  details               String                 @db.LongText
+  createdAt             DateTime               @default(now()) @db.Timestamp(0)
+  updatedAt             DateTime               @default(now()) @db.Timestamp(0)
+  meddolic_user_details meddolic_user_details  @relation(fields: [userId], references: [member_id], onDelete: Cascade, onUpdate: Restrict, map: "fk_withdrawalMethods_userId")
+  withdrawalRequests    withdrawalRequests[]
+
+  @@unique([userId, type], map: "uniq_user_type")
+}
+
+model withdrawalRequests {
+  id                    Int                         @id @default(autoincrement())
+  userId                Int
+  methodId              Int
+  type                  withdrawalRequests_type
+  currency              withdrawalRequests_currency
+  originalAmount        Decimal                     @db.Decimal(10, 2)
+  amount                Decimal                     @db.Decimal(10, 2)
+  charge                Decimal                     @default(0.00) @db.Decimal(10, 2)
+  netAmount             Decimal                     @db.Decimal(10, 2)
+  destinationSnapshot   String                      @db.LongText
+  status                withdrawalRequests_status   @default(PENDING)
+  rejectionReason       String?                     @db.VarChar(255)
+  transactionRef        String?                     @db.VarChar(100)
+  requestedAt           DateTime                    @db.Timestamp(0)
+  processedAt           DateTime?                   @db.Timestamp(0)
+  updatedAt             DateTime                    @db.Timestamp(0)
+  withdrawalMethods     withdrawalMethods           @relation(fields: [methodId], references: [id], onUpdate: Restrict, map: "fk_withdrawalRequests_methodId")
+  meddolic_user_details meddolic_user_details       @relation(fields: [userId], references: [member_id], onDelete: Cascade, onUpdate: Restrict, map: "fk_withdrawalRequests_userId")
+
+  @@index([methodId], map: "fk_withdrawalRequests_methodId")
+  @@index([status, requestedAt], map: "idx_status_date")
+  @@index([userId, status], map: "idx_user_status")
+}
+
+model usdDepositBonus {
+  id                    Int                   @id @default(autoincrement())
+  userId                Int
+  depositAmount         Decimal               @db.Decimal(10, 2)
+  bonus                 Decimal               @db.Decimal(10, 2)
+  createdAt             DateTime              @db.Timestamp(0)
+  meddolic_user_details meddolic_user_details @relation(fields: [userId], references: [member_id], onDelete: Cascade, onUpdate: Restrict, map: "fk_usdDepositBonus_userId")
+
+  @@index([userId], map: "fk_usdDepositBonus_userId")
+}
+
+enum withdrawalMethods_type {
+  UPI
+  BANK
+  TRC20
+  BSC
+}
+
+enum safeTransactions_type {
+  deposit
+  withdraw
+}
+
+enum animalBets_betOn {
+  TIGER
+  SNAKE
+  SHARK
+  FOX
+  CHEETAH
+  BEAR
+  WHALE
+  LION
+}
+
+enum cryptoTradeBets_betOn {
+  UP
+  DOWN
+  TIE
+}
+
+enum animal_result {
+  TIGER
+  SNAKE
+  SHARK
+  FOX
+  CHEETAH
+  BEAR
+  WHALE
+  LION
+}
+
+enum dragonTigerBet_betType {
+  DRAGON
+  TIGER
+  TIE
+}
+
+enum headTailBets_betOn {
+  ANDAR
+  BAHAR
+}
+
+enum andarBahar_result {
+  ANDAR
+  BAHAR
+}
+
+enum carRoulette_result {
+  BMW
+  PORSCHE
+  MUSTANG
+  LAMBORGHINI
+  JAGUAR
+  FERRARI
+  LAND_ROVER
+  MERCEDES
+}
+
+enum dragonTiger_result {
+  DRAGON
+  TIGER
+  TIE
+}
+
+enum gameSettings_game {
+  WIN_GO
+  LUCKY_100
+  HEAD_TAIL
+  LOTTERY_SPIN
+  UP_DOWN
+  DRAGON_TIGER
+  CRYPTO_TRADE
+  FOREX_TRADE
+  ANIMAL_ROULETTE
+  CAR_ROULETTE
+  ANDAR_BAHAR
+  K3
+  TRX
+}
+
+enum headTail_result {
+  HEAD
+  TAIL
+}
+
+enum andarBaharBets_betOn {
+  ANDAR
+  BAHAR
+}
+
+enum updown_bets_bet_on {
+  E7
+  L7
+  G7
+
+  @@map("7updown_bets_bet_on")
+}
+
+enum carRouletteBet_betType {
+  BMW
+  PORSCHE
+  MUSTANG
+  LAMBORGHINI
+  JAGUAR
+  FERRARI
+  LAND_ROVER
+  MERCEDES
+}
+
+enum withdrawalRequests_type {
+  UPI
+  BANK
+  TRC20
+  BSC
+}
+
+enum chickenRoadBet_difficulty {
+  EASY
+  MEDIUM
+  HARD
+  HARDCORE
+}
+
+enum forexTradeBets_betOn {
+  UP
+  DOWN
+  TIE
+}
+
+enum winGoBets_color {
+  RED
+  VIOLET
+  GREEN
+}
+
+enum walletAddresses_status {
+  ENABLE
+  DISABLE
+}
+
+enum aviatorBet_side {
+  LEFT
+  RIGHT
+}
+
+enum carRoulette_status {
+  RUNNING
+  CALCULATING
+  COMPLETED
+}
+
+enum dragonTiger_status {
+  RUNNING
+  CALCULATING
+  COMPLETED
+}
+
+enum upiIds_status {
+  ENABLE
+  DISABLE
+}
+
+enum lucky100Bets_evenOdd {
+  EVEN
+  ODD
+}
+
+enum lucky100_winEvenOdd {
+  EVEN
+  ODD
+}
+
+enum withdrawalRequests_currency {
+  INR
+  USD
+}
+
+enum trxBets_color {
+  RED
+  VIOLET
+  GREEN
+}
+
+enum winGoBets_bigSmall {
+  BIG
+  SMALL
+}
+
+enum cryptoTrade_result {
+  UP
+  DOWN
+  TIE
+}
+
+enum recharges_type {
+  INR
+  USDT
+}
+
+enum aviator_status {
+  BETTING
+  FLYING
+  ENDED
+}
+
+enum lucky100Bets_bigSmall {
+  BIG
+  SMALL
+}
+
+enum forexTrade_result {
+  UP
+  DOWN
+  TIE
+}
+
+enum lucky100_winBigSmall {
+  BIG
+  SMALL
+}
+
+enum trxBets_bigSmall {
+  BIG
+  SMALL
+}
+
+enum wallet_statements_type {
+  CREDIT
+  DEBIT
+}
+
+enum animal_status {
+  RUNNING
+  COMPLETED
+}
+
+enum andarBahar_status {
+  RUNNING
+  COMPLETED
+}
+
+enum aviator_outcome {
+  CRASHED
+  FLEW_AWAY
+}
+
+enum headTail_status {
+  RUNNING
+  COMPLETED
+}
+
+enum giftCode_status {
+  ACTIVE
+  EXPIRED
+  DEPLETED
+}
+
+enum winGo_status {
+  RUNNING
+  COMPLETED
+}
+
+enum wallet_statements_wallet_type {
+  WALLET
+  FUND_WALLET
+  BONUS_WALLET
+  SAFE_WALLET
+  SAFE_INTEREST_WALLET
+}
+
+enum updown_games_status {
+  RUNNING
+  COMPLETED
+
+  @@map("7updown_games_status")
+}
+
+enum recharges_status {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum reward_summary_status {
+  RUNNING
+  STOPPED
+}
+
+enum cryptoTrade_status {
+  RUNNING
+  COMPLETED
+}
+
+enum trx_status {
+  RUNNING
+  COMPLETED
+}
+
+enum dragonTigerBet_status {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+enum forexTrade_status {
+  RUNNING
+  COMPLETED
+}
+
+enum lucky100_status {
+  RUNNING
+  COMPLETED
+}
+
+enum carRouletteBet_status {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+enum aviatorBet_status {
+  PENDING
+  CASHED_OUT
+  LOST
+}
+
+enum withdrawalRequests_status {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum animalBets_status {
+  PENDING
+  WIN
+  LOSE
+}
+
+enum cryptoTradeBets_status {
+  PENDING
+  WIN
+  LOSE
+}
+
+enum headTailBets_status {
+  PENDING
+  WIN
+  LOSE
+}
+
+enum andarBaharBets_status {
+  PENDING
+  WIN
+  LOSE
+}
+
+enum updown_bets_status {
+  PENDING
+  WIN
+  LOSE
+
+  @@map("7updown_bets_status")
+}
+
+enum chickenRoadBet_status {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+enum forexTradeBets_status {
+  PENDING
+  WIN
+  LOSE
+}
+
+enum winGoBets_status {
+  PENDING
+  WIN
+  LOSE
+}
+
+enum lucky100Bets_status {
+  PENDING
+  WIN
+  LOSE
+}
+
+enum trxBets_status {
+  PENDING
+  WIN
+  LOSE
+}
+
+enum recharges_method {
+  OFFLINE
+  ONLINE
+  P2P
+}

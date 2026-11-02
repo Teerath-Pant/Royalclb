@@ -1,0 +1,50 @@
+
+    .navbar__content-right .backIcon[data-v-3949aac6] {
+      width: .64rem;
+      height: .64rem;
+      background-size: .64rem;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-image: url(/User/assets/png/next1.png);
+    }
+
+    .textfont1 {
+      font-size: 12px !important;
+      font-weight: bold !important;
+      color: #717171 !important;
+      text-transform: capitalize !important;
+      font-family: Verdana, Geneva, sans-serif !important;
+    }
+
+    .textfont11 {
+      font-size: 18px !important;
+      font-weight: bold !important;
+      color: #804000 !important;
+      border: 1px solid;
+      border-radius: 10px;
+      padding-top: 5px !important;
+      padding-bottom: 3px !important;
+    }
+
+    .text11 {
+      color: #FFF !important;
+      font-size: 14px !important;
+    }
+
+    .text22 {
+      color: #FFC !important;
+      font-size: 10px !important;
+    }
+
+    .box2 {
+      background-color: #EFE1AF !important;
+      color: #FFF !important;
+    }
+
+    .wallet-container-content .container {
+      position: relative !important;
+      margin-top: -0.33333rem !important;
+      top: 0 !important;
+      height: auto !important;
+    }
+  

@@ -1,0 +1,91 @@
+
+    @media screen and (max-width:426px) {
+      div#loadingloader {
+        display: none;
+      }
+
+      #app {
+        width: 100%;
+        min-height: 60vh;
+      }
+    }
+
+    .navbar.activity {
+      background: #232328 !important;
+      height: 60px !important;
+    }
+
+    .navbar-fixed {
+      background: #232328 !important;
+      height: 60px !important;
+      line-height: 60px !important;
+      display: flex;
+      align-items: center;
+    }
+
+    .navbar__content {
+      height: 47.83px !important;
+      width: 100%;
+    }
+
+    .navbar__content-title {
+      font-size: 18px !important;
+      line-height: 60px !important;
+    }
+
+    .van-icon-arrow-left::before {
+      color: #dca654 !important;
+      font-size: 24px;
+    }
+
+    .gift-card {
+      background: #241e22;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 15px;
+    }
+
+    .gift-input {
+      width: 100%;
+      padding: 12px 20px;
+      background: #110D14;
+      border: none;
+      border-radius: 20px;
+      color: #fde4bc;
+      margin-top: 10px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    input:focus {
+      outline: .01333rem solid #3D363A;
+      -webkit-user-select: text;
+      user-select: text;
+    }
+
+    .gift-btn {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(90deg, #FED358, #FFB472);
+      border: none;
+      border-radius: 20px;
+      color: #333;
+      font-weight: bold;
+      font-size: 16px;
+      margin-top: 25px;
+      cursor: pointer;
+    }
+
+    .gift-title {
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #B79C8B;
+    }
+
+    .gift-subtitle {
+      font-size: 14px;
+      color: #B79C8B;
+      margin-bottom: 25px;
+    }
+  

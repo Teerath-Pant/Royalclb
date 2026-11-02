@@ -1,0 +1,61 @@
+
+        @media screen and (max-width:426px) {
+          div#loadingloader {
+            display: none;
+          }
+          #app {
+            width: 100%;
+            min-height: 60vh;
+          }
+        }
+        .navbar.activity {
+            background: #232328 !important;
+            height: 60px !important;
+        }
+        .navbar-fixed {
+            background: #232328 !important;
+            height: 60px !important;
+            line-height: 60px !important;
+            display: flex;
+            align-items: center;
+        }
+        .navbar__content {
+            height: 47.83px !important;
+            width: 100%;
+        }
+        .navbar__content-title {
+            font-size: 18px !important;
+            line-height: 60px !important;
+        }
+        .van-icon-arrow-left::before {
+            color: #dca654 !important;
+            font-size: 24px;
+        }
+      
+
+        .claim-btn {
+          border: none;
+          outline: none;
+          padding: .25rem .5rem;
+          border-radius: 15px;
+          margin-top: .25rem;
+          font-weight: 500;
+          color: white;
+          width: 80%;
+          font-size: 11px;
+        }
+        .claim-btn:disabled {
+          background-color: #51464e;
+          color: #FFC ;
+        }
+        .claim-btn.claimable {
+          background-color: #f5a623;
+          color: #000;
+          font-weight: bold;
+        }
+        .claim-btn.claimed {
+          background-color: #10b981;
+          pointer-events: none;
+        }
+      
+.dailySignIn__container img { vertical-align: bottom; }

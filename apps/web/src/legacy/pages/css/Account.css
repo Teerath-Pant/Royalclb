@@ -1,0 +1,25 @@
+
+    .navbar__content-right .backIcon[data-v-3949aac6] {
+      width: .64rem;
+      height: .64rem;
+      background-size: .64rem;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-image: url(/User/assets/png/next1.png);
+    }
+
+    .backgrd {
+      background-color: #241e22 !important;
+    }
+
+    .text11 {
+      color: #FDE4BC !important;
+      font-size: 14px !important;
+    }
+
+    .text22 {
+      color: #b77c4c !important;
+      font-size: 10px !important;
+      background-color: #241e22 !important;
+    }
+  

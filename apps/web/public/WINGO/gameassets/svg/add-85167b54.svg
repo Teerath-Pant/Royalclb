@@ -1,0 +1,9 @@
+<svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="jia">
+<circle id="Ellipse 330" cx="25" cy="25" r="25" fill="#D9AC4F"/>
+<g id="Vector">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M10 25C10 23.8954 10.8954 23 12 23H38C39.1046 23 40 23.8954 40 25C40 26.1046 39.1046 27 38 27H12C10.8954 27 10 26.1046 10 25Z" fill="#8F5206"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M25 10C26.1046 10 27 10.8954 27 12L27 38C27 39.1046 26.1046 40 25 40C23.8954 40 23 39.1046 23 38L23 12C23 10.8954 23.8954 10 25 10Z" fill="#8F5206"/>
+</g>
+</g>
+</svg>

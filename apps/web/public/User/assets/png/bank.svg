@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="gold-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fceb9c" />
+      <stop offset="50%" stop-color="#f0a038" />
+      <stop offset="100%" stop-color="#cb9c37" />
+    </linearGradient>
+  </defs>
+  <!-- Bank Roof Triangle -->
+  <path d="M32 8 L6 24 L58 24 Z" fill="url(#gold-grad)" />
+  <!-- Roof Base Bar -->
+  <rect x="6" y="25" width="52" height="4" rx="1" fill="url(#gold-grad)" />
+  <!-- Pillars -->
+  <rect x="11" y="31" width="7" height="20" rx="1.5" fill="url(#gold-grad)" />
+  <rect x="23" y="31" width="7" height="20" rx="1.5" fill="url(#gold-grad)" />
+  <rect x="34" y="31" width="7" height="20" rx="1.5" fill="url(#gold-grad)" />
+  <rect x="46" y="31" width="7" height="20" rx="1.5" fill="url(#gold-grad)" />
+  <!-- Foundation Base -->
+  <rect x="6" y="52" width="52" height="5" rx="1.5" fill="url(#gold-grad)" />
+</svg>

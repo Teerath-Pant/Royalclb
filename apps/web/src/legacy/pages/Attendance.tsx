@@ -1,0 +1,37 @@
+/* Generated from User/attendance_c.php. Markup is the PHP template; data arrives as props. */
+/* oxlint-disable typescript/no-explicit-any */
+import { Fragment } from "react";
+import type { CSSProperties as CSS } from "react";
+
+import { LegacyFooter } from "../footer";
+import { go, attrs, important, number_format } from "../php";
+import inlineCss from "./css/Attendance.css?raw";
+
+const DEFAULTS: Record<string, any> = {};
+
+export const legacy = {
+  stylesheets: [
+  "/User/assets/css/modules-b642e9bc.css",
+  "/User/assets/css/page-activity-e94516d2.css",
+  "/User/assets/css/index-37a2335c.css",
+  "/User/assets/css/page-home-3889ef4f.css",
+  "/User/assets/css/page-login-7527a426.css",
+  "/User/assets/css/page-main-5a34fc00.css",
+  "/User/assets/css/page-home-4a55d8dd.css"
+],
+  inlineCss,
+  tailwind: false,
+  htmlStyle: "",
+  bodyStyle: "font-size: 12px; background: #232328; color: #fff;",
+};
+
+// oxlint-disable-next-line typescript/no-explicit-any
+export function AttendanceView(props: Record<string, any>) {
+  const { day7, rewards, totalAttended, totalBet } = props;
+  
+  return (
+    <>
+      {" "}<div id="app" data-v-app="" style={{ minHeight: "100vh" } as CSS}>{" "}<div data-v-f1e983bd="" className="dailySignIn__container" style={{ "--f13b4d11-currentFontFamily": "'Roboto', 'Inter', sans-serif" } as CSS}>{" "}<div data-v-12a80a3e="" data-v-f1e983bd="" className="navbar activity" ref={important("background: #232328 !important;height: 47.83px !important")}>{" "}<div data-v-12a80a3e="" className="navbar-fixed" ref={important("background: #232328 !important;height:47.83 !important")}>{" "}<div data-v-12a80a3e="" className="navbar__content" ref={important("height:  47.83px !important;background: #382e35 !important")}>{" "}<div data-v-12a80a3e="" className="navbar__content-left"><i onClick={() => window.history.back()} data-v-12a80a3e="" className="van-badge__wrapper van-icon van-icon-arrow-left" id="backbuttom" ref={important("color: #dca654 !important")} style={{ fontSize: "24px" } as CSS} /></div>{" "}<div data-v-12a80a3e="" className="navbar__content-center">{" "}<div data-v-12a80a3e="" className="navbar__content-title" ref={important("color: #dca654 !important;font-size: 18px !important;line-height: 60px !important")} style={{ fontWeight: "bold" } as CSS}>{"Attendance"}</div>{" "}</div>{" "}<div data-v-12a80a3e="" className="navbar__content-right" />{" "}</div>{" "}</div>{" "}</div>{" "}<div style={{ background: "#e74141 url(/User/assets/images/headerBg-wH9KQKE_.png) no-repeat center center", backgroundSize: "cover", padding: "20px", borderRadius: "0 0 30px 30px", position: "relative", overflow: "hidden" } as CSS}>{" "}<h1 style={{ color: "#fff", margin: "0", fontSize: "20px", fontWeight: "bold", position: "relative", zIndex: "1" } as CSS}>{"Attendance bonus"}</h1>{" "}<p style={{ color: "#fff", fontSize: "12px", marginTop: "5px", marginBottom: "0", position: "relative", zIndex: "1" } as CSS}>{"Get rewards based on consecutive login days"}</p>{" "}<div style={{ background: "#fff", display: "inline-flex", alignItems: "center", padding: "3px 10px", borderRadius: "4px", marginTop: "15px", position: "relative", zIndex: "1" } as CSS}>{" "}<span style={{ color: "#e74141", fontSize: "12px" } as CSS}>{"Attended consecutively "}</span>{" "}<span style={{ color: "#e74141", fontWeight: "bold", fontSize: "16px", margin: "0 4px" } as CSS} id="day-count">{totalAttended}</span>{" "}<span style={{ color: "#e74141", fontSize: "12px" } as CSS}>{" Day"}</span>{" "}<div style={{ position: "absolute", right: "-12px", top: "0", borderTop: "13px solid transparent", borderBottom: "13px solid transparent", borderLeft: "12px solid #fff" } as CSS} />{" "}</div>{" "}<p style={{ color: "#fff", fontSize: "12px", marginTop: "15px", marginBottom: "5px", position: "relative", zIndex: "1" } as CSS}>{"Accumulated"}</p>{" "}<h1 style={{ color: "#fff", margin: "0", fontSize: "24px", fontWeight: "bold", position: "relative", zIndex: "1" } as CSS}>{"₹"}{number_format(totalBet, 2)}</h1>{" "}<div style={{ display: "flex", gap: "10px", marginTop: "25px", position: "relative", zIndex: "1", justifyContent: "space-between" } as CSS}>{" "}<button style={{ background: "linear-gradient(90deg, #ffb300, #ff8f00)", color: "#fff", border: "none", padding: "8px 20px", borderRadius: "20px", fontWeight: "bold", fontSize: "12px", boxShadow: "0 2px 4px rgba(0,0,0,0.2)" } as CSS}>{"Game Rules"}</button>{" "}<button style={{ background: "linear-gradient(90deg, #ffb300, #ff8f00)", color: "#fff", border: "none", padding: "8px 20px", borderRadius: "20px", fontWeight: "bold", fontSize: "12px", boxShadow: "0 2px 4px rgba(0,0,0,0.2)" } as CSS}>{"Attendance history"}</button>{" "}</div>{" "}</div>{" "}<div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "10px", padding: "15px", marginTop: "5px" } as CSS}>{" "}{rewards.map((valReward: any, _i: number) => {  return (<Fragment key={_i}>{" "}{(valReward?.claimable) ? (<>{" "}<form action="claimAttendenceBack.php" method="POST" id={`claim-attendence-${valReward?.achievedId}`} style={{ display: "none" } as CSS}>{" "}<input type="hidden" name="attendenc_id" defaultValue={valReward?.achievedId} />{" "}</form>{" "}</>) : null}{" "}<div style={{ background: "#382e35", borderRadius: "8px", textAlign: "center", padding: "10px 0", position: "relative" } as CSS}>{" "}<div style={{ color: "#dca654", fontWeight: "bold", fontSize: "14px" } as CSS}>{"₹"}{number_format(valReward?.bonus, 2)}</div>{" "}<img src="/User/images/coin-294b6998.png" style={{ width: "35px", margin: "5px 0" } as CSS} />{" "}<div style={{ color: "#c4933f", fontSize: "11px" } as CSS}>{valReward?.day}{" Day"}</div>{" "}<div style={{ color: "#c4933f", fontSize: "10px", marginBottom: "5px" } as CSS}>{"Target: "}{valReward?.bet_need}</div>{" "}<button className={`claim-btn ${valReward?.btnClass}`} {...attrs(valReward?.btnAttr)} type="submit" form={`claim-attendence-${valReward?.achievedId}`}>{valReward?.btnText}</button>{" "}</div>{" "}</Fragment>); })}{" "}</div>{" "}{(day7) ? (<>{" "}<div style={{ padding: "0 15px 40px 15px" } as CSS}>{" "}{(day7?.claimable) ? (<>{" "}<form action="claimAttendenceBack.php" method="POST" id={`claim-attendence-${day7?.achievedId}`} style={{ display: "none" } as CSS}>{" "}<input type="hidden" name="attendenc_id" defaultValue={day7?.achievedId} />{" "}</form>{" "}</>) : null}{" "}<div style={{ background: "#382e35", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "15px", position: "relative", overflow: "hidden" } as CSS}>{" "}<img src="/User/images/day7Bg-ada1d750.png" style={{ position: "absolute", left: "0", bottom: "0", height: "100%" } as CSS} />{" "}<div style={{ textAlign: "right", zIndex: "1", position: "relative", width: "100%" } as CSS}>{" "}<div style={{ color: "#dca654", fontSize: "18px", fontWeight: "bold" } as CSS}>{"— ₹"}{number_format(day7?.bonus, 2)}{" —"}</div>{" "}<div style={{ color: "#c4933f", fontSize: "14px", marginTop: "5px" } as CSS}>{"7 Day"}</div>{" "}<div style={{ color: "#c4933f", fontSize: "11px", marginBottom: "5px" } as CSS}>{"Target: "}{day7?.bet_need}</div>{" "}<button className={`claim-btn ${day7?.btnClass}`} {...attrs(day7?.btnAttr)} type="submit" form={`claim-attendence-${day7?.achievedId}`} style={{ width: "auto", padding: "5px 20px", float: "right" } as CSS}>{day7?.btnText}</button>{" "}</div>{" "}</div>{" "}</div>{" "}</>) : null}{" "}</div>{" "}</div>{" "}
+    </>
+  );
+}

@@ -1,0 +1,62 @@
+
+    .userInfo__container-setting-center[data-v-47200dd8] {
+      top: 3rem !important;
+    }
+
+    .content[data-v-271ecdd2] {
+      padding-top: 0.4rem !important;
+    }
+
+    .navbar__content-right .backIcon[data-v-3949aac6] {
+      width: .64rem;
+      height: .64rem;
+      background-size: .64rem;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-image: url(/User/assets/png/next1.png);
+    }
+
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 1.41rem;
+      height: 0.83rem;
+      flex-shrink: 0;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-switch .slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: #55505a;
+      transition: 0.2s;
+      border-radius: 0.83rem;
+    }
+
+    .toggle-switch .slider::before {
+      position: absolute;
+      content: "";
+      height: 0.72rem;
+      width: 0.72rem;
+      left: 0.055rem;
+      bottom: 0.055rem;
+      background-color: #fff;
+      box-shadow: 0 0.03rem 0.03rem 0 rgba(0, 0, 0, 0.15);
+      transition: 0.2s;
+      border-radius: 50%;
+    }
+
+    .toggle-switch input:checked+.slider {
+      background-color: #d4af37;
+    }
+
+    .toggle-switch input:checked+.slider::before {
+      transform: translateX(0.58rem);
+    }
+  

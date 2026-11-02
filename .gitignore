@@ -4,3 +4,8 @@ dist
 .env*
 *.zip
 CLAUDE.md
+generated
+*.log
+logs
+uploads
+!.env.example

@@ -1,12 +1,43 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
-    "target": "es2023",
-    "module": "nodenext",
+    /* Language & Emit */
+    "target": "ES2023",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
+    "lib": ["ES2023"],
+
+    /* Modules */
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "noUncheckedSideEffectImports": true,
+
+    /* Interop */
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+
+    /* Strict Type-Checking */
     "strict": true,
+    "noUncheckedIndexedAccess": true,
+
+    /* Code Quality */
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+
+    /* Completeness/Perf */
     "skipLibCheck": true,
+
+    /* Misc */
+    "outDir": "dist",
     "types": ["node"],
-    "rootDir": "src",
-    "outDir": "dist"
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
-  "include": ["src"]
+  "include": ["src/**/*.ts", "scripts/**/*.ts", "generated/prisma", "*.ts"],
+  "exclude": ["node_modules", "dist"]
 }
