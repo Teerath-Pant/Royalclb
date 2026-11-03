@@ -1,33 +1,23 @@
-import {
-  CalendarDays,
-  CircleDollarSign,
-  Gamepad2,
-  Image,
-  Mail,
-  Settings,
-  UserPlus,
-  Wallet,
-  type LucideIcon,
-} from 'lucide-react'
-
 export type MenuItem = { label: string; to: string }
-export type MenuGroup = { label: string; icon: LucideIcon; items: MenuItem[] }
-export type MenuEntry = MenuGroup | (MenuItem & { icon: LucideIcon })
+export type MenuGroup = { id: string; label: string; icon: string; items: MenuItem[] }
+export type MenuLink = MenuItem & { id: string; icon: string }
+export type MenuEntry = MenuGroup | MenuLink
 
-// Mirrors Admin/include/menu.php (commented-out entries are skipped, as in the original)
 export const menu: MenuEntry[] = [
-  { label: 'Dashboard', to: '/dashboard', icon: CalendarDays },
+  { id: 'dashboard', label: 'Dashboard', to: '/dashboard', icon: 'ri-calendar-event-fill' },
   {
+    id: 'member',
     label: 'User Management',
-    icon: UserPlus,
+    icon: 'ri-user-add-fill',
     items: [
       { label: 'View Member', to: '/viewMember' },
       { label: 'Search Member', to: '/searchMember' },
     ],
   },
   {
+    id: 'winGo',
     label: 'Win Go',
-    icon: Gamepad2,
+    icon: 'ri-user-add-fill',
     items: [
       { label: 'Game History (30 Sec)', to: '/winGo?interval=0.5' },
       { label: 'Game History (1 Min)', to: '/winGo?interval=1' },
@@ -36,19 +26,33 @@ export const menu: MenuEntry[] = [
     ],
   },
   {
+    id: 'k3',
     label: 'K3',
-    icon: Gamepad2,
-    items: [1, 3, 5, 10].map((m) => ({
-      label: `Game History (${m} Min)`,
-      to: `/gameHistoryK3?interval=${m}`,
-    })),
+    icon: 'ri-user-add-fill',
+    items: [1, 3, 5, 10].map((m) => ({ label: `Game History (${m} Min)`, to: `/gameHistoryK3?interval=${m}` })),
   },
-  { label: 'Dragon Tiger', icon: Gamepad2, items: [{ label: 'Game History', to: '/gameHistoryDT' }] },
-  { label: 'Animal Roulette', icon: Gamepad2, items: [{ label: 'Game History', to: '/animal' }] },
-  { label: 'Aviator', icon: Gamepad2, items: [{ label: 'Game History', to: '/gameHistoryAviator' }] },
   {
+    id: 'dragonTiger',
+    label: 'Dragon Tiger',
+    icon: 'ri-user-add-fill',
+    items: [{ label: 'Game History', to: '/gameHistoryDT' }],
+  },
+  {
+    id: 'animal',
+    label: 'Animal Roulette',
+    icon: 'ri-user-add-fill',
+    items: [{ label: 'Game History', to: '/animal' }],
+  },
+  {
+    id: 'aviator',
+    label: 'Aviator',
+    icon: 'ri-user-add-fill',
+    items: [{ label: 'Game History', to: '/gameHistoryAviator' }],
+  },
+  {
+    id: 'transfer',
     label: 'Fund Manager',
-    icon: Mail,
+    icon: 'ri-mail-open-fill',
     items: [
       { label: 'Fund Request Details', to: '/recharges' },
       { label: 'Deposit Online History', to: '/funddepositHistory' },
@@ -59,26 +63,39 @@ export const menu: MenuEntry[] = [
     ],
   },
   {
+    id: 'banner',
     label: 'App Banner',
-    icon: Image,
+    icon: 'ri-mail-open-fill',
     items: [
       { label: 'Update Banner', to: '/bannerUpdate' },
       { label: 'Update Notice', to: '/newsUpdate' },
     ],
   },
-  { label: 'Withdraw', icon: CircleDollarSign, items: [{ label: 'Withdrawals', to: '/withdrawals' }] },
   {
+    id: 'withdraw',
+    label: 'Withdraw',
+    icon: 'ri-money-dollar-circle-fill',
+    items: [{ label: 'Withdrawals', to: '/withdrawals' }],
+  },
+  {
+    id: 'support',
     label: 'Support',
-    icon: Mail,
+    icon: 'fa fa-envelope',
     items: [
       { label: 'New Tickets', to: '/newSupportTicket' },
       { label: 'Support Tickets', to: '/supportTicket' },
     ],
   },
-  { label: 'Wallet', icon: Wallet, items: [{ label: 'Wallet Statement', to: '/walletStatement' }] },
   {
+    id: 'wallet',
+    label: 'Wallet',
+    icon: 'ri-wallet-fill',
+    items: [{ label: 'Wallet Statement', to: '/walletStatement' }],
+  },
+  {
+    id: 'settings',
     label: 'Settings',
-    icon: Settings,
+    icon: 'ri-wallet-fill',
     items: [
       { label: 'Upi Settings', to: '/upi' },
       { label: 'Wallet Address Settings', to: '/wallet-address' },
@@ -90,3 +107,15 @@ export const menu: MenuEntry[] = [
 ]
 
 export const isGroup = (e: MenuEntry): e is MenuGroup => 'items' in e
+
+export function activeTo(pathname: string, search: string) {
+  if (pathname === '/viewMemberDetails') return '/viewMember'
+  if (pathname === '/winGoBets') return `/winGo?interval=${new URLSearchParams(search).get('interval') ?? 0.5}`
+  if (pathname === '/betHistoryK3') return `/gameHistoryK3?interval=${new URLSearchParams(search).get('interval')}`
+  if (pathname === '/betHistoryDT') return '/gameHistoryDT'
+  if (pathname === '/animalBets') return '/animal'
+  if (pathname === '/betHistoryAviator') return '/gameHistoryAviator'
+  if (['/viewActiveMember', '/viewInActiveMember', '/activeIncomeUserMember'].includes(pathname)) return '/viewMember'
+  if (pathname === '/walletOutstanding') return '/walletStatement'
+  return pathname + search
+}

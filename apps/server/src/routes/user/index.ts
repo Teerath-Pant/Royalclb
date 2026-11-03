@@ -20,6 +20,18 @@ import {
   getTeam,
 } from "./team";
 import { toggle2fa } from "./toggle-2fa";
+import { adminDashboard } from "./get-dashboard-admin";
+import { getMembers } from "./get-members-admin";
+import { setMemberStatus } from "./set-member-status-admin";
+import { getMemberDetails } from "./get-member-details-admin";
+import { updateMemberDetails } from "./update-member-details-admin";
+import { searchMembers } from "./search-members-admin";
+import { getSponserName } from "./get-sponser-name-admin";
+import { getActiveMembers } from "./get-active-members-admin";
+import { getInActiveMembers } from "./get-inactive-members-admin";
+import { getMembersByJoinDate } from "./get-members-by-join-date-admin";
+import { getWalletOutstanding } from "./get-wallet-outstanding-admin";
+import { getWalletStatements } from "./get-wallet-statements-admin";
 
 export function userRouter(app: FastifyInstance) {
   getName(app);
@@ -40,4 +52,17 @@ export function userRouter(app: FastifyInstance) {
   getTeam(app);
   getNewRegistrations(app);
   getStatement(app);
+
+  adminDashboard(app);
+  getMembers(app);
+  setMemberStatus(app);
+  getMemberDetails(app);
+  updateMemberDetails(app);
+  searchMembers(app);
+  getSponserName(app);
+  getActiveMembers(app);
+  getInActiveMembers(app);
+  getMembersByJoinDate(app);
+  getWalletOutstanding(app);
+  getWalletStatements(app);
 }

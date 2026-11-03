@@ -1,8 +1,22 @@
 import { useLocation } from 'react-router-dom'
-import Card from '../components/Card'
 
-// Placeholder for pages not ported yet. Replace one route at a time in App.tsx.
 export default function ComingSoon() {
   const { pathname } = useLocation()
-  return <Card title={pathname.slice(1)}>Not ported yet.</Card>
+
+  return (
+    <div className="container-fluid">
+      <div className="row">
+        <div className="col-sm-12">
+          <div className="iq-card">
+            <div className="iq-card-header d-flex justify-content-between">
+              <div className="iq-header-title">
+                <h4 className="card-title">{pathname.slice(1)}</h4>
+              </div>
+            </div>
+            <div className="iq-card-body">Not ported yet.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }

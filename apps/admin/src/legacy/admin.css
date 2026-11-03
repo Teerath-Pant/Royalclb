@@ -1,0 +1,84 @@
+.text-orange {
+  color: #fb8500;
+}
+
+.text-red {
+  color: #e63946;
+}
+
+.text-green-light {
+  color: #4c956c;
+}
+
+.text-green-dark {
+  color: #588157;
+}
+
+.hide {
+  display: none !important;
+}
+
+table.dataTable thead .sorting:before,
+table.dataTable thead .sorting_asc:before,
+table.dataTable thead .sorting_desc:before,
+table.dataTable thead .sorting_asc_disabled:before,
+table.dataTable thead .sorting_desc_disabled:before,
+table.dataTable thead .sorting:after,
+table.dataTable thead .sorting_asc:after,
+table.dataTable thead .sorting_desc:after,
+table.dataTable thead .sorting_asc_disabled:after,
+table.dataTable thead .sorting_desc_disabled:after {
+  display: none !important;
+}
+
+.highlight {
+  background-color: yellow;
+}
+
+.pill-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.pill {
+  width: fit-content;
+  height: fit-content;
+  margin: 0;
+  border-radius: 100vmax;
+  display: flex;
+  font-weight: 500;
+}
+
+.pill .name {
+  background-color: #dcfce7;
+  color: #022c22;
+  padding: 0.8rem 1.5rem;
+  padding-right: 1rem;
+  border-top-left-radius: 100vmax;
+  border-bottom-left-radius: 100vmax;
+}
+
+.pill .amount {
+  background-color: #a7f3d0;
+  color: #022c22;
+  padding: 0.8rem 1.5rem;
+  padding-left: 1rem;
+  border-top-right-radius: 100vmax;
+  border-bottom-right-radius: 100vmax;
+}
+
+.reset-btn {
+  outline: none;
+  border: none;
+  padding: 0.5rem 1.5rem;
+  background-color: #f43f5e;
+  color: white;
+  border-radius: 0.5rem;
+}
+
+#from_date,
+#to_date {
+  cursor: pointer;
+}
