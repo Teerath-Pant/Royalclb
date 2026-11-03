@@ -1,7 +1,7 @@
 /** Deposit payment pages (UPI, USDT, online): the PHP markup with its three scripts folded into one hook. */
 import { useQuery } from "@tanstack/react-query";
 import QRCode from "qrcode";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { api, apiPost } from "@/lib/api";
 import { notyf } from "@/lib/notyf";
@@ -16,7 +16,24 @@ type Kind = "INR" | "USDT" | "ONLINE";
 
 /** Same behaviour as the inline script: copy, cancel, the countdown, the QR code and the submit button. */
 function usePayPage(kind: Kind, qrValue: string | undefined, rechargeId?: number, amount?: string) {
+  // The markup is a lazy chunk, so it may not be in the DOM yet when the data arrives; wait for it.
+  const [mounted, setMounted] = useState(false);
   useEffect(() => {
+    if (mounted) {
+      return;
+    }
+    const poll = setInterval(() => {
+      if (document.querySelector("#base-timer-label, #qrcode")) {
+        setMounted(true);
+      }
+    }, 50);
+    return () => clearInterval(poll);
+  }, [mounted]);
+
+  useEffect(() => {
+    if (!mounted) {
+      return;
+    }
     const cleanups: (() => void)[] = [];
     const on = (el: Element | null, event: string, run: () => void) => {
       el?.addEventListener(event, run);
@@ -74,7 +91,7 @@ function usePayPage(kind: Kind, qrValue: string | undefined, rechargeId?: number
       });
     }
     return () => cleanups.forEach((run) => run());
-  }, [kind, qrValue, rechargeId, amount]);
+  }, [mounted, kind, qrValue, rechargeId, amount]);
 }
 
 type Target = { id: number; address: string; amount: number };

@@ -3,6 +3,7 @@ import * as v from "valibot";
 import { AppResponse } from "@/utils/app-response";
 import { createFastifyHandler } from "@/utils/create-fastify-handler";
 import { withColumnScale } from "@/utils/decimal-scale";
+import { istDayRange } from "@/utils/date";
 import { pageQuery, paged } from "@/utils/page-query";
 import { requireUser } from "@/utils/require-user";
 
@@ -53,27 +54,51 @@ export const getTeam = createFastifyHandler({
     requireUser(ctx);
     const { page, limit } = searchParams;
     const id = ctx.user.member_id;
-    const offset = (page - 1) * limit;
+    const childRelation = "meddolic_user_details_meddolic_user_child_ids_child_idTomeddolic_user_details";
 
     const [total, rows] = await Promise.all([
       ctx.db.meddolic_user_child_ids.count({ where: { member_id: id } }),
-      ctx.db.$queryRaw<Record<string, unknown>[]>`
-        SELECT a.member_id, a.uid, a.user_id, a.topup_flag, a.date_time, b.level,
-          c.user_id AS referralUserId,
-          COALESCE((SELECT SUM(amount) FROM recharges WHERE userId = a.member_id), 0) AS totalDeposit
-        FROM meddolic_user_child_ids b
-        JOIN meddolic_user_details a ON a.member_id = b.child_id
-        JOIN meddolic_user_details c ON c.member_id = a.sponser_id
-        WHERE b.member_id = ${id}
-        ORDER BY a.date_time DESC
-        LIMIT ${limit} OFFSET ${offset}
-      `,
+      ctx.db.meddolic_user_child_ids.findMany({
+        where: { member_id: id },
+        select: {
+          level: true,
+          [childRelation]: {
+            select: {
+              member_id: true,
+              uid: true,
+              user_id: true,
+              topup_flag: true,
+              date_time: true,
+              meddolic_user_details: { select: { user_id: true } },
+            },
+          },
+        },
+        orderBy: { [childRelation]: { date_time: "desc" } },
+        take: limit,
+        skip: (page - 1) * limit,
+      }),
     ]);
 
-    const data = rows.map((row) => ({
-      ...row,
-      totalDeposit: Number(row.totalDeposit),
-    }));
+    const deposits = await ctx.db.recharges.groupBy({
+      by: ["userId"],
+      where: { userId: { in: rows.map((row) => row[childRelation].member_id) } },
+      _sum: { amount: true },
+    });
+    const depositOf = new Map(deposits.map((d) => [d.userId, d._sum.amount?.toNumber() ?? 0]));
+
+    const data = rows.map((row) => {
+      const child = row[childRelation];
+      return {
+        member_id: child.member_id,
+        uid: child.uid,
+        user_id: child.user_id,
+        topup_flag: child.topup_flag,
+        date_time: child.date_time,
+        level: row.level,
+        referralUserId: child.meddolic_user_details?.user_id ?? null,
+        totalDeposit: depositOf.get(child.member_id) ?? 0,
+      };
+    });
 
     return AppResponse.success(reply, {
       message: "Team fetched successfully",
@@ -89,13 +114,16 @@ export const getNewRegistrations = createFastifyHandler({
 
   async handler({ reply, ctx }) {
     requireUser(ctx);
-    const rows = await ctx.db.$queryRaw<Record<string, unknown>[]>`
-      SELECT t2.uid, t2.user_id, t2.phone, t2.topup_flag, t2.date_time
-      FROM meddolic_user_child_ids t1
-      JOIN meddolic_user_details t2 ON t1.child_id = t2.member_id
-      WHERE t1.member_id = ${ctx.user.member_id} AND t1.level <= 6 AND DATE(t2.date_time) = CURDATE()
-      ORDER BY t2.date_time DESC
-    `;
+    const rows = await ctx.db.meddolic_user_details.findMany({
+      where: {
+        date_time: istDayRange(),
+        meddolic_user_child_ids_meddolic_user_child_ids_child_idTomeddolic_user_details: {
+          some: { member_id: ctx.user.member_id, level: { lte: 6 } },
+        },
+      },
+      select: memberSelect,
+      orderBy: { date_time: "desc" },
+    });
 
     return AppResponse.success(reply, {
       message: "New registrations fetched successfully",

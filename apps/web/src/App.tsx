@@ -33,6 +33,7 @@ const LEGACY_ROUTES = {
   "/settings": page(screens, "Settings"),
   "/vip": page(screens, "Vip"),
   "/dragon-tiger": page(() => import("@/games/dragon-tiger"), "DragonTiger"),
+  "/animal": page(() => import("@/games/animal"), "Animal"),
   "/bet-report": page(alpinePages, "BetReport"),
   "/support": page(screens, "Support"),
   "/upi-pay": page(pay, "UpiPay"),

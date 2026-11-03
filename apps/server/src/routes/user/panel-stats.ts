@@ -1,14 +1,11 @@
+import type { Decimal } from "decimal.js";
+
 import { getFundSettings } from "@/ops/fund-settings";
 import { AppResponse } from "@/utils/app-response";
 import { createFastifyHandler } from "@/utils/create-fastify-handler";
+import { istDayRange } from "@/utils/date";
 import { requireUser } from "@/utils/require-user";
-
-/** Raw SUM()/COUNT() columns come back as Decimal or BigInt, which JSON can't all carry. */
-function toNumbers(row: Record<string, unknown> | undefined) {
-  return Object.fromEntries(
-    Object.entries(row ?? {}).map(([key, value]) => [key, Number(value)])
-  );
-}
+import { safeDecimal } from "@/utils/safe-decimal";
 
 export const getWalletSummary = createFastifyHandler({
   method: "GET",
@@ -17,35 +14,83 @@ export const getWalletSummary = createFastifyHandler({
 
   async handler({ reply, ctx }) {
     requireUser(ctx);
-    const id = ctx.user.member_id;
+    const { db } = ctx;
+    const member_id = ctx.user.member_id;
+    const today = { date_time: istDayRange() };
 
-    const [row] = await ctx.db.$queryRaw<Record<string, unknown>[]>`
-      SELECT
-        COALESCE((SELECT SUM(amount) FROM recharges WHERE userId = ${id} AND status = 'APPROVED'), 0) AS depositAmount,
-        COALESCE((SELECT SUM(amount) FROM withdrawalRequests WHERE userId = ${id} AND status = 'APPROVED'), 0) AS totalWithdrawal,
-        COALESCE((SELECT SUM(bonus) FROM meddolic_user_registration_bonus WHERE member_id = ${id} AND DATE(date_time) = CURDATE() AND status = 1), 0)
-          + COALESCE((SELECT SUM(income) FROM meddolic_user_self_deposit_bonus WHERE member_id = ${id} AND DATE(date_time) = CURDATE() AND status = 1), 0)
-          + COALESCE((SELECT SUM(commission) FROM meddolic_user_trade_commission WHERE member_id = ${id} AND DATE(date_time) = CURDATE() AND status = 1), 0)
-          + COALESCE((SELECT SUM(salary) FROM meddolic_user_salary_bonus WHERE member_id = ${id} AND DATE(date_time) = CURDATE() AND release_status = 1), 0) AS todayIncome,
-        COALESCE((SELECT SUM(bonus) FROM meddolic_user_registration_bonus WHERE member_id = ${id} AND status = 1), 0)
-          + COALESCE((SELECT SUM(income) FROM meddolic_user_self_deposit_bonus WHERE member_id = ${id} AND status = 1), 0)
-          + COALESCE((SELECT SUM(commission) FROM meddolic_user_trade_commission WHERE member_id = ${id} AND status = 1), 0)
-          + COALESCE((SELECT SUM(salary) FROM meddolic_user_salary_bonus WHERE member_id = ${id} AND release_status = 1), 0) AS totalIncome,
-        COALESCE((SELECT SUM(income) FROM meddolic_user_deposit_bonus WHERE member_id = ${id} AND deposit_number IN (1, 2)), 0) AS depBonus12,
-        COALESCE((SELECT SUM(income) FROM meddolic_user_deposit_bonus WHERE member_id = ${id} AND deposit_number IN (3, 4, 5)), 0) AS depBonus345,
-        COALESCE((SELECT SUM(bonus) FROM meddolic_user_daily_recharge_bonus WHERE member_id = ${id} AND status = 1), 0) AS dailyDepBonus,
-        COALESCE((SELECT SUM(b.bonus) FROM meddolic_user_attendence_bonus a JOIN meddolic_config_attendence_bonus b ON a.day = b.day WHERE a.member_id = ${id}), 0) AS attendanceBonus,
-        COALESCE((SELECT SUM(commission) FROM meddolic_user_trade_commission WHERE member_id = ${id} AND status = 1), 0) AS betCommission,
-        COALESCE((SELECT SUM(rebate_income) FROM meddolic_user_rebate_income WHERE member_id = ${id}), 0) AS rebateIncome,
-        COALESCE((SELECT SUM(bonus) FROM usdDepositBonus WHERE userId = ${id}), 0) AS usdDepositBonus
-    `;
+    const [
+      deposit,
+      withdrawal,
+      regToday,
+      regTotal,
+      selfToday,
+      selfTotal,
+      tradeToday,
+      tradeTotal,
+      salaryToday,
+      salaryTotal,
+      depBonus12,
+      depBonus345,
+      dailyDep,
+      attendance,
+      attendanceConfig,
+      rebate,
+      usdDeposit,
+    ] = await Promise.all([
+      db.recharges.aggregate({ where: { userId: member_id, status: "APPROVED" }, _sum: { amount: true } }),
+      db.withdrawalRequests.aggregate({ where: { userId: member_id, status: "APPROVED" }, _sum: { amount: true } }),
+      db.meddolic_user_registration_bonus.aggregate({ where: { member_id, status: 1, ...today }, _sum: { bonus: true } }),
+      db.meddolic_user_registration_bonus.aggregate({ where: { member_id, status: 1 }, _sum: { bonus: true } }),
+      db.meddolic_user_self_deposit_bonus.aggregate({ where: { member_id, status: 1, ...today }, _sum: { income: true } }),
+      db.meddolic_user_self_deposit_bonus.aggregate({ where: { member_id, status: 1 }, _sum: { income: true } }),
+      db.meddolic_user_trade_commission.aggregate({ where: { member_id, status: 1, ...today }, _sum: { commission: true } }),
+      db.meddolic_user_trade_commission.aggregate({ where: { member_id, status: 1 }, _sum: { commission: true } }),
+      db.meddolic_user_salary_bonus.aggregate({ where: { member_id, release_status: 1, ...today }, _sum: { salary: true } }),
+      db.meddolic_user_salary_bonus.aggregate({ where: { member_id, release_status: 1 }, _sum: { salary: true } }),
+      db.meddolic_user_deposit_bonus.aggregate({ where: { member_id, deposit_number: { in: [1, 2] } }, _sum: { income: true } }),
+      db.meddolic_user_deposit_bonus.aggregate({ where: { member_id, deposit_number: { in: [3, 4, 5] } }, _sum: { income: true } }),
+      db.meddolic_user_daily_recharge_bonus.aggregate({ where: { member_id, status: 1 }, _sum: { bonus: true } }),
+      db.meddolic_user_attendence_bonus.findMany({ where: { member_id }, select: { day: true } }),
+      db.meddolic_config_attendence_bonus.findMany({ select: { day: true, bonus: true } }),
+      db.meddolic_user_rebate_income.aggregate({ where: { member_id }, _sum: { rebate_income: true } }),
+      db.usdDepositBonus.aggregate({ where: { userId: member_id }, _sum: { bonus: true } }),
+    ]);
+
+    // Same as the old join: each claimed day is paired with every config row for that day.
+    const bonusByDay = new Map<number, Decimal>();
+    for (const { day, bonus } of attendanceConfig) {
+      bonusByDay.set(day, (bonusByDay.get(day) ?? safeDecimal(0)).plus(bonus));
+    }
+    const attendanceBonus = attendance.reduce(
+      (total, { day }) => total.plus(bonusByDay.get(day) ?? 0),
+      safeDecimal(0)
+    );
+
+    const todayIncome = safeDecimal(regToday._sum.bonus)
+      .plus(safeDecimal(selfToday._sum.income))
+      .plus(safeDecimal(tradeToday._sum.commission))
+      .plus(safeDecimal(salaryToday._sum.salary));
+    const totalIncome = safeDecimal(regTotal._sum.bonus)
+      .plus(safeDecimal(selfTotal._sum.income))
+      .plus(safeDecimal(tradeTotal._sum.commission))
+      .plus(safeDecimal(salaryTotal._sum.salary));
 
     const { bonusWallet, fundWallet, wallet } = ctx.user;
 
     return AppResponse.success(reply, {
       message: "Wallet summary fetched successfully",
       data: {
-        ...toNumbers(row),
+        depositAmount: safeDecimal(deposit._sum.amount).toNumber(),
+        totalWithdrawal: safeDecimal(withdrawal._sum.amount).toNumber(),
+        todayIncome: todayIncome.toNumber(),
+        totalIncome: totalIncome.toNumber(),
+        depBonus12: safeDecimal(depBonus12._sum.income).toNumber(),
+        depBonus345: safeDecimal(depBonus345._sum.income).toNumber(),
+        dailyDepBonus: safeDecimal(dailyDep._sum.bonus).toNumber(),
+        attendanceBonus: attendanceBonus.toNumber(),
+        betCommission: safeDecimal(tradeTotal._sum.commission).toNumber(),
+        rebateIncome: safeDecimal(rebate._sum.rebate_income).toNumber(),
+        usdDepositBonus: safeDecimal(usdDeposit._sum.bonus).toNumber(),
         totalWallet: bonusWallet.plus(fundWallet).plus(wallet).toFixed(2),
       },
     });
@@ -59,20 +104,38 @@ export const getPromotion = createFastifyHandler({
 
   async handler({ reply, ctx }) {
     requireUser(ctx);
-    const id = ctx.user.member_id;
+    const { db } = ctx;
+    const member_id = ctx.user.member_id;
 
-    const [row] = await ctx.db.$queryRaw<Record<string, unknown>[]>`
-      SELECT
-        (SELECT COUNT(1) FROM meddolic_user_details WHERE sponser_id = ${id}) AS totalSponser,
-        (SELECT COUNT(1) FROM meddolic_user_child_ids WHERE member_id = ${id} AND level BETWEEN 1 AND 9) AS totalTeam,
-        COALESCE((SELECT SUM(amount) FROM recharges WHERE userId IN (SELECT member_id FROM meddolic_user_details WHERE sponser_id = ${id}) AND status = 'APPROVED'), 0) AS totalDirectDeposit,
-        COALESCE((SELECT SUM(amount) FROM recharges WHERE userId IN (SELECT child_id FROM meddolic_user_child_ids WHERE member_id = ${id}) AND status = 'APPROVED'), 0) AS totalTeamDeposit,
-        COALESCE((SELECT SUM(commission) FROM meddolic_user_trade_commission WHERE member_id = ${id} AND status = 1 AND DATE(date_time) = SUBDATE(CURDATE(), 1)), 0) AS yesterdayCommission
-    `;
+    const [totalSponser, totalTeam, team, directDeposit, yesterday] = await Promise.all([
+      db.meddolic_user_details.count({ where: { sponser_id: member_id } }),
+      db.meddolic_user_child_ids.count({ where: { member_id, level: { gte: 1, lte: 9 } } }),
+      db.meddolic_user_child_ids.findMany({ where: { member_id }, select: { child_id: true } }),
+      db.recharges.aggregate({
+        where: { status: "APPROVED", meddolic_user_details: { sponser_id: member_id } },
+        _sum: { amount: true },
+      }),
+      db.meddolic_user_trade_commission.aggregate({
+        where: { member_id, status: 1, date_time: istDayRange(-1) },
+        _sum: { commission: true },
+      }),
+    ]);
+
+    const teamDeposit = await db.recharges.aggregate({
+      where: { status: "APPROVED", userId: { in: team.map((t) => t.child_id) } },
+      _sum: { amount: true },
+    });
 
     return AppResponse.success(reply, {
       message: "Promotion stats fetched successfully",
-      data: { ...toNumbers(row), referralCode: ctx.user.user_id },
+      data: {
+        totalSponser,
+        totalTeam,
+        totalDirectDeposit: safeDecimal(directDeposit._sum.amount).toNumber(),
+        totalTeamDeposit: safeDecimal(teamDeposit._sum.amount).toNumber(),
+        yesterdayCommission: safeDecimal(yesterday._sum.commission).toNumber(),
+        referralCode: ctx.user.user_id,
+      },
     });
   },
 });

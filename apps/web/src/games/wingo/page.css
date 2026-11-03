@@ -1,0 +1,64 @@
+@media only screen and (min-width: 100px) and (max-width: 359px) {
+  html {
+    font-size: 37px !important;
+  }
+}
+
+@media only screen and (min-width: 360px) and (max-width: 419px) {
+  html {
+    font-size: 39px !important;
+  }
+}
+
+@media only screen and (min-width: 420px) and (max-width: 768px) {
+  html {
+    font-size: 41px !important;
+  }
+}
+
+.ar-loading-view {
+  background-color: #0000004d;
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+  left: 0;
+  position: fixed;
+}
+
+.loading-wrapper {
+  pointer-events: none;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  align-items: center;
+  height: 100%;
+  position: absolute;
+  width: 100%;
+}
+
+.hide {
+  display: none !important;
+}
+
+[x-cloak] {
+  display: none !important;
+}
+
+.chart-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  z-index: 9;
+}
+
+#spnwallet {
+  cursor: pointer;
+}

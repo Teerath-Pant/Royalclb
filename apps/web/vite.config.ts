@@ -25,6 +25,8 @@ export default defineConfig({
     strictPort: true,
     // The API has no /api prefix of its own; production needs the same rewrite in the reverse proxy.
     proxy: {
+      // Admin-uploaded banners live on the PHP site; production serves them from the same domain.
+      '/assets/SupportFile': { target: 'https://royalclub.world', changeOrigin: true },
       '/api': {
         target: 'http://localhost:3000',
         ws: true, // the games use Socket.IO at /api/socket.io

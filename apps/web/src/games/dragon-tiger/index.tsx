@@ -8,6 +8,7 @@ import { profileQuery } from "@/queries/profile";
 import { LegacyPage } from "@/legacy/use-legacy";
 import type { LegacyStyles } from "@/legacy/use-legacy";
 
+import { A, AmountChips, ConfettiBanner, FullscreenButton, Navbar, WalletBox } from "../chrome";
 import { showConfetti } from "../confetti";
 import { createOnce, fetchWalletTotal, placeBetRequest, randomBetween, useRoundSocket } from "../shared";
 import type { RoundMessage } from "../shared";
@@ -38,6 +39,7 @@ type Side = "DRAGON" | "TIGER" | "TIE";
 type TotalBet = { dragonBet: number; tigerBet: number; tieBet: number };
 
 const img = (file: string) => `${BASE}/images/${file}`;
+
 
 function Game() {
   const profile = useQuery(profileQuery).data;
@@ -222,44 +224,13 @@ function Game() {
 
   return (
     <>
-      <div className="contentt" ref={banner}>
-        <h1 ref={bannerText} />
-      </div>
+      <ConfettiBanner bannerRef={banner} headingRef={bannerText} />
       <div id="rotateMessage" style={{ display: portrait ? "block" : "none" }} />
       <div id="app">
-        <div className="mian game">
-          <div className="navbar">
-            <div className="navbar-left" onClick={() => (window.location.href = "/home")}>
-              <div className="c-row c-row-middle-center">
-                <img src={img("XZDS.png")} className="navbar-back" />
-              </div>
-            </div>
-            <div className="navbar-title">
-              <div className="c-row c-row-middle-center">Royalclub</div>
-            </div>
-            <div className="navbar-right">
-              <div className="c-row navbarR">
-                <div className="content">
-                  <div className="page-box">
-                    <div className="flex-row-between flex-center period-span">
-                      <div className="flex-row-end">
-                        <div className="li-item">{seconds[0]}</div>
-                        <div className="li-item">{seconds[1]}</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="game-head">
-            <button id="fullscreenBtn" disabled={!supported} onClick={() => void toggle()}>
-              <img
-                id="fullscreenIcon"
-                src={img(fullscreen ? "minimize-square-minimalistic-svgrepo-com.svg" : "maximize-square-minimalistic-svgrepo-com.svg")}
-                alt={supported ? (fullscreen ? "Exit Fullscreen" : "Enter Fullscreen") : "Fullscreen not supported"}
-              />
-            </button>
+        <div className="mian game" {...A}>
+          <Navbar base={BASE} seconds={seconds} />
+          <div className="game-head" {...A}>
+            <FullscreenButton base={BASE} fullscreen={fullscreen} supported={supported} onClick={() => void toggle()} />
             <div className="game-container">
               <div className="buttons">
                 <button style={{ display: "none" }}>Show Dragon</button>
@@ -291,26 +262,8 @@ function Game() {
                   {frame("TIGER", totals.tigerBet, "tiger.png")}
                 </div>
               </div>
-              <div className="wallet">
-                <div className="c-row c-row-left">
-                  <div className="num">
-                    <span className="moneyU" id="wallet">
-                      {walletText}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div className="bet-section">
-                <div>
-                  {AMOUNTS.map((amount) => (
-                    <button
-                      key={amount}
-                      className={`bet-btn-value bet-${amount} ${betAmount === amount ? "active" : ""}${flash === amount ? " active" : ""}`}
-                      onClick={() => chooseAmount(amount)}
-                    />
-                  ))}
-                </div>
-              </div>
+              <WalletBox text={walletText} />
+              <AmountChips amounts={AMOUNTS} selected={betAmount} flash={flash} onPick={chooseAmount} />
             </div>
           </div>
           <div id="main-table" style={{ display: "none" }} />

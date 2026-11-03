@@ -8,7 +8,7 @@ export const API_URL = "/api";
 export const DOMAIN = typeof window === "undefined" ? "" : window.location.host;
 
 /** Game pages are not part of this app; they are still served by the PHP site on the same domain. */
-const GAME_PAGE = /^(?:\.\.\/|\/)?(WINGO|aviator|k3|animal|anderbahar|carroulette|7updown|HeadTail|LUCKY100|CRYPTO|FOREX|5d|chicken-road)(?:\/|$)/i;
+const GAME_PAGE = /^(?:\.\.\/|\/)?(WINGO|aviator|k3|anderbahar|carroulette|7updown|HeadTail|LUCKY100|CRYPTO|FOREX|5d|chicken-road)(?:\/|$)/i;
 
 /** Link target from a template: app routes go through the router, everything else is a real navigation. */
 export function go(url: string) {
