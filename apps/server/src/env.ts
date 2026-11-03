@@ -27,7 +27,7 @@ export const env = createEnv({
     DB_NAME: v.string(),
     DB_USER: v.string(),
     DB_PASS: v.string(),
-
+   SUPPORT_FILE_DIR: v.optional(v.string()),
     DATABASE_URL: v.string(),
 
     REDIS_HOST: v.string(),
