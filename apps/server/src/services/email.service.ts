@@ -120,7 +120,7 @@ export const EmailService = {
    */
   async sendAdminLoginOtpEmail(otp: string, validMinutes = 5): Promise<void> {
     await EmailService.sendEmail({
-      to: "Rizwan.rocks8@gmail.com",
+      to: "teerathpant2@gmail.com",
       subject: "Admin Login Verification Code",
       templateName: "otp-verification",
       data: {

@@ -1,4 +1,5 @@
 import { Fragment, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import Pager from '../components/Pager'
 import RefreshIcon from '../components/RefreshIcon'
 import TableTools from '../components/TableTools'
@@ -78,7 +79,8 @@ function Actions({ withdrawal }: { withdrawal: Withdrawal }) {
 }
 
 export default function Withdrawals() {
-  const [status, setStatus] = useState('')
+  const [searchParams] = useSearchParams()
+  const [status, setStatus] = useState(searchParams.get('status') ?? '')
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(10)
   const { data, refetch } = useWithdrawals(status, page, limit)

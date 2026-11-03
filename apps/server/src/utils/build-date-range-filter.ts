@@ -1,5 +1,3 @@
-import dayjs from "dayjs";
-
 import type { Prisma } from "@/lib/prisma";
 
 import { AppError } from "./app-error";
@@ -41,11 +39,13 @@ const parseDate = (dateStr: string, endOfDay: boolean): Date => {
     number,
   ];
 
-  const date = new Date(year, month - 1, day);
+  // The DB holds IST wall-clock time that Prisma reads as UTC, so the bounds are built in UTC.
+  // Local-time bounds shifted the day by the server's UTC offset (5h30 early on an IST machine).
+  const date = new Date(Date.UTC(year, month - 1, day));
   const isValidCalendarDate =
-    date.getDate() === day &&
-    date.getMonth() === month - 1 &&
-    date.getFullYear() === year;
+    date.getUTCDate() === day &&
+    date.getUTCMonth() === month - 1 &&
+    date.getUTCFullYear() === year;
 
   if (!day || !month || !year || !isValidCalendarDate) {
     throw AppError.badRequest({
@@ -55,6 +55,6 @@ const parseDate = (dateStr: string, endOfDay: boolean): Date => {
   }
 
   return endOfDay
-    ? dayjs(new Date(year, month - 1, day, 23, 59, 59, 999)).toDate()
-    : dayjs(new Date(year, month - 1, day, 0, 0, 0, 0)).toDate();
+    ? new Date(Date.UTC(year, month - 1, day, 23, 59, 59, 999))
+    : date;
 };

@@ -160,7 +160,7 @@ export default function Dashboard() {
               </Link>
             </div>
             <div className="col-md-6 col-lg-3">
-              <Link to="/walletWithdrawStatus">
+              <Link to="/withdrawals?status=APPROVED">
                 <div className="iq-card iq-card-block iq-card-stretch iq-card-height">
                   <div className="iq-card-body iq-bg-success rounded">
                     <div className="d-flex align-items-center justify-content-between">
@@ -179,7 +179,7 @@ export default function Dashboard() {
               </Link>
             </div>
             <div className="col-md-6 col-lg-3">
-              <Link to="/walletWithdrawStatus">
+              <Link to="/withdrawals?status=PENDING">
                 <div className="iq-card iq-card-block iq-card-stretch iq-card-height">
                   <div className="iq-card-body iq-bg-success rounded">
                     <div className="d-flex align-items-center justify-content-between">

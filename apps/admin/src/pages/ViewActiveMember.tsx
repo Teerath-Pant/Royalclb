@@ -2,22 +2,12 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import Pager from '../components/Pager'
 import TableTools from '../components/TableTools'
-import { useDatepicker } from '../lib/datepicker'
 import { useActiveMembers } from '../queries/member-lists'
-
-const today = () => new Date().toLocaleDateString('en-GB', { timeZone: 'Asia/Kolkata' }).replaceAll('/', '-')
 
 export default function ViewActiveMember() {
   const [params, setParams] = useSearchParams()
-  const hasParams = params.size > 0
   const userId = params.get('user_id') ?? ''
-  const fromDate = hasParams ? (params.get('from_date') ?? '') : today()
-  const toDate = hasParams ? (params.get('to_date') ?? '') : today()
   const userRef = useRef<HTMLInputElement>(null)
-  const fromRef = useRef<HTMLInputElement>(null)
-  const toRef = useRef<HTMLInputElement>(null)
-  useDatepicker(fromRef)
-  useDatepicker(toRef)
 
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(10)
@@ -38,11 +28,7 @@ export default function ViewActiveMember() {
                 key={params.toString()}
                 onSubmit={(e) => {
                   e.preventDefault()
-                  setParams({
-                    user_id: userRef.current?.value ?? '',
-                    from_date: fromRef.current?.value ?? '',
-                    to_date: toRef.current?.value ?? '',
-                  })
+                  setParams({ user_id: userRef.current?.value ?? '' })
                   setPage(1)
                 }}
               >
@@ -55,32 +41,6 @@ export default function ViewActiveMember() {
                       placeholder="Enter User ID"
                       name="user_id"
                       defaultValue={data?.invalidUserId ? '' : userId}
-                    />
-                  </div>
-                  <div className="col-3">
-                    <input
-                      ref={fromRef}
-                      type="text"
-                      name="from_date"
-                      id="from_date"
-                      className="form-control "
-                      placeholder="e.g. From Date"
-                      required
-                      defaultValue={fromDate}
-                      readOnly
-                    />
-                  </div>
-                  <div className="col-3">
-                    <input
-                      ref={toRef}
-                      type="text"
-                      name="to_date"
-                      id="to_date"
-                      className="form-control "
-                      placeholder="e.g. To Date"
-                      required
-                      defaultValue={toDate}
-                      readOnly
                     />
                   </div>
                   <div className="col-2">

@@ -46,6 +46,8 @@ export const env = createEnv({
     SMTP_PASS: v.string(),
 
     JWT_SECRET: v.string(),
+
+    SUPPORT_FILE_DIR: v.optional(v.string()),
   },
   runtimeEnv: process.env,
   skipValidation: Boolean(process.env.SKIP_ENV_VALIDATION),

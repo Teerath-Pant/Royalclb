@@ -13,6 +13,8 @@ export default function WalletStatement() {
   const userId = params.get('user_id') ?? ''
   const fromDate = hasParams ? (params.get('from_date') ?? '') : today()
   const toDate = hasParams ? (params.get('to_date') ?? '') : today()
+  // No params means the page opened with today's date in the inputs, so the query must use it too.
+  const query = hasParams ? params.toString() : new URLSearchParams({ from_date: fromDate, to_date: toDate }).toString()
   const userRef = useRef<HTMLInputElement>(null)
   const fromRef = useRef<HTMLInputElement>(null)
   const toRef = useRef<HTMLInputElement>(null)
@@ -21,7 +23,7 @@ export default function WalletStatement() {
 
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(10)
-  const { data } = useWalletStatements(params.toString(), page, limit)
+  const { data } = useWalletStatements(query, page, limit)
 
   useEffect(() => {
     if (data?.invalidUserId) alert('Invalid User Id')
