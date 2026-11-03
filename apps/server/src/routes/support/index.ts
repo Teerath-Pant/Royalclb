@@ -11,20 +11,13 @@ import { createFastifyHandler } from "@/utils/create-fastify-handler";
 import { Now } from "@/utils/date";
 import { requireUser } from "@/utils/require-user";
 
-const UPLOAD_DIR = path.join(import.meta.dirname, "..", "..", "..", "uploads", "support");
+import { UPLOAD_DIR, detectFileType } from "./files";
+import { getSupportSubjects } from "./get-subjects-admin";
+import { getSupportTickets } from "./get-tickets-admin";
+import { updateSupportTicket } from "./update-ticket-admin";
+import { getSupportAttachment } from "./get-attachment-admin";
+
 const MAX_FILE_BYTES = 5_000_000;
-
-// Checked against the file's own bytes, so a renamed script can't get in.
-const FILE_TYPES = [
-  { ext: "png", mime: "image/png", magic: [0x89, 0x50, 0x4e, 0x47] },
-  { ext: "jpg", mime: "image/jpeg", magic: [0xff, 0xd8, 0xff] },
-  { ext: "gif", mime: "image/gif", magic: [0x47, 0x49, 0x46, 0x38] },
-  { ext: "pdf", mime: "application/pdf", magic: [0x25, 0x50, 0x44, 0x46] },
-];
-
-function detectFileType(bytes: Buffer) {
-  return FILE_TYPES.find((type) => type.magic.every((b, i) => bytes[i] === b));
-}
 
 async function saveAttachment(base64: string) {
   const bytes = Buffer.from(base64, "base64");
@@ -199,4 +192,9 @@ export function supportRouter(app: FastifyInstance) {
   getTickets(app);
   createTicket(app);
   getAttachment(app);
+
+  getSupportSubjects(app);
+  getSupportTickets(app);
+  updateSupportTicket(app);
+  getSupportAttachment(app);
 }

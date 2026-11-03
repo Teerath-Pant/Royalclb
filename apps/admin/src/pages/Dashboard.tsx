@@ -1,95 +1,244 @@
 import { Link } from 'react-router-dom'
+import { useAdminMe } from '../queries/auth'
+import { useDashboard } from '../queries/dashboard'
 
-// Mock data — replaced by API in phase 2
-const referralLink = 'https://royalclub.example/register.php?referralCode=admin'
+const shareBtn = { display: 'inline-block', marginTop: '1px', fontWeight: 'bold', padding: '3px 8px', borderRadius: '5px' }
 
 export default function Dashboard() {
-  const copy = () => navigator.clipboard.writeText(referralLink).then(() => alert('Referral Link Copied Successfully'))
-  const btn = 'rounded px-2 py-0.5 text-sm font-bold text-white'
+  const { data: me } = useAdminMe()
+  const { data: d } = useDashboard()
+  if (!d || !me) return null
+
+  const domain = location.host
+  const referralLink = `https://${domain}/register.php?referralCode=${me.userId}`
+  const copyLink = () => navigator.clipboard.writeText(referralLink).then(() => alert('Referral Link Copied Successfully'))
 
   return (
-    <>
-      <div className="mb-6 flex flex-wrap items-center justify-center gap-2 text-lg font-semibold text-ink">
-        <span>Referral Link</span>
-        <button onClick={copy} className={`${btn} cursor-pointer bg-success`}>Copy</button>
-        <a target="_blank" href={`https://wa.me/?text=${referralLink}`} className={`${btn} bg-success`}>Whatsapp</a>
-        <a target="_blank" href={`https://www.facebook.com/sharer/sharer.php?u=${referralLink}`} className={`${btn} bg-primary`}>Facebook</a>
-        <a target="_blank" href={`https://t.me/share/url?url=${referralLink}`} className={`${btn} bg-primary`}>Telegram</a>
+    <div className="container-fluid">
+      <div className="row">
+        <div className="col-lg-12 col-xs-12">
+          <div className="form-group" style={{ textAlign: 'center', fontSize: 18, fontWeight: 600, color: '#fff' }}>
+            <label>Referral Link</label>{' '}
+            <a
+              style={shareBtn}
+              href="#"
+              onClick={(e) => {
+                e.preventDefault()
+                copyLink()
+              }}
+              className="btn btn-sm btn-success waves-effect"
+            >
+              <i className="fa fa-copy"></i>
+              <span>Copy </span>
+            </a>{' '}
+            <a
+              style={shareBtn}
+              target="_blank"
+              href={`https://${domain}/send?phone=&text=${referralLink}`}
+              className="btn btn-sm btn-success waves-effect"
+            >
+              <i className="fa fa-whatsapp"></i>
+              <span>Whatsapp</span>
+            </a>{' '}
+            <a
+              style={shareBtn}
+              target="_blank"
+              href={`https://${domain}/sharer/sharer.php?u=${referralLink}&quote=text`}
+              className="btn btn-sm btn-primary waves-effect"
+            >
+              <i className="fa fa-facebook-f"></i>
+              <span>Facebook</span>
+            </a>{' '}
+            <a
+              style={shareBtn}
+              target="_blank"
+              href={`https://${domain}/telegram.me/share/url?url=h?affiliateCode=${me.userId}&text=text`}
+              className="btn btn-sm btn-primary waves-effect"
+            >
+              <i className="fa fa-telegram"></i>
+              <span>Telegram</span>
+            </a>
+          </div>
+        </div>
+        <div className="col-lg-12">
+          <div className="row">
+            <div className="col-md-6 col-lg-3">
+              <Link to="/viewMember">
+                <div className="iq-card iq-card-block iq-card-stretch iq-card-height">
+                  <div className="iq-card-body iq-bg-primary rounded">
+                    <div className="d-flex align-items-center justify-content-between">
+                      <div className="rounded-circle iq-card-icon bg-primary">
+                        <i className="ri-user-fill"></i>
+                      </div>
+                      <div className="text-right">
+                        <h3 className="mb-0">
+                          <i className="fa fa-user"></i> {d.totalUser ?? '0'}
+                        </h3>
+                        <h6 className="">Total User</h6>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            </div>
+            <div className="col-md-6 col-lg-3">
+              <Link to="/viewActiveMember">
+                <div className="iq-card iq-card-block iq-card-stretch iq-card-height">
+                  <div className="iq-card-body iq-bg-success rounded">
+                    <div className="d-flex align-items-center justify-content-between">
+                      <div className="rounded-circle iq-card-icon bg-success">
+                        <i className="ri-user-fill"></i>
+                      </div>
+                      <div className="text-right">
+                        <h3 className="mb-0">
+                          <i className="fa fa-user"></i> {d.activeMember ?? '0'}
+                        </h3>
+                        <h6 className="">Active User</h6>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            </div>
+            <div className="col-md-6 col-lg-3">
+              <Link to="/viewInActiveMember">
+                <div className="iq-card iq-card-block iq-card-stretch iq-card-height">
+                  <div className="iq-card-body iq-bg-danger rounded">
+                    <div className="d-flex align-items-center justify-content-between">
+                      <div className="rounded-circle iq-card-icon bg-danger">
+                        <i className="ri-user-fill"></i>
+                      </div>
+                      <div className="text-right">
+                        <h3 className="mb-0">
+                          <i className="fa fa-user"></i> {d.inActiveMember ?? '0'}
+                        </h3>
+                        <h6 className="">In Active User</h6>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            </div>
+
+            <div className="col-md-6 col-lg-3">
+              <Link to="/activeIncomeUserMember">
+                <div className="iq-card iq-card-block iq-card-stretch iq-card-height">
+                  <div className="iq-card-body iq-bg-primary rounded">
+                    <div className="d-flex align-items-center justify-content-between">
+                      <div className="rounded-circle iq-card-icon bg-danger">
+                        <i className="ri-user-fill"></i>
+                      </div>
+                      <div className="text-right">
+                        <h3 className="mb-0" style={{ fontSize: 14 }}>
+                          {d.totalActiveIncome ?? '0'}
+                        </h3>
+                        <h6 className="">Active Income User</h6>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            </div>
+
+            <div className="col-md-6 col-lg-3">
+              <Link to="/recharges?status=PENDING">
+                <div className="iq-card iq-card-block iq-card-stretch iq-card-height">
+                  <div className="iq-card-body iq-bg-success rounded">
+                    <div className="d-flex align-items-center justify-content-between">
+                      <div className="rounded-circle iq-card-icon bg-success">
+                        <span>&#36;</span>
+                      </div>
+                      <div className="text-right">
+                        <h3 className="mb-0" style={{ fontSize: 14 }}>
+                          {d.fundRequest ?? '0.00'}₹
+                        </h3>
+                        <h6 className="">Pending Fund Request</h6>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            </div>
+            <div className="col-md-6 col-lg-3">
+              <Link to="/walletWithdrawStatus">
+                <div className="iq-card iq-card-block iq-card-stretch iq-card-height">
+                  <div className="iq-card-body iq-bg-success rounded">
+                    <div className="d-flex align-items-center justify-content-between">
+                      <div className="rounded-circle iq-card-icon bg-success">
+                        <span>&#36;</span>
+                      </div>
+                      <div className="text-right">
+                        <h3 className="mb-0" style={{ fontSize: 14 }}>
+                          {d.totalWithdraw ?? '0.00'}₹
+                        </h3>
+                        <h6 className="">Total Withdraw</h6>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            </div>
+            <div className="col-md-6 col-lg-3">
+              <Link to="/walletWithdrawStatus">
+                <div className="iq-card iq-card-block iq-card-stretch iq-card-height">
+                  <div className="iq-card-body iq-bg-success rounded">
+                    <div className="d-flex align-items-center justify-content-between">
+                      <div className="rounded-circle iq-card-icon bg-success">
+                        <span>&#36;</span>
+                      </div>
+                      <div className="text-right">
+                        <h3 className="mb-0" style={{ fontSize: 14 }}>
+                          {d.totalPendingWithdraw ?? '0.00'}₹
+                        </h3>
+                        <h6 className="">Pending Withdrawal</h6>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            </div>
+            <div className="col-md-6 col-lg-3">
+              <Link to="/viewMember">
+                <div className="iq-card iq-card-block iq-card-stretch iq-card-height">
+                  <div className="iq-card-body iq-bg-success rounded">
+                    <div className="d-flex align-items-center justify-content-between">
+                      <div className="rounded-circle iq-card-icon bg-success">
+                        <span>&#36;</span>
+                      </div>
+                      <div className="text-right">
+                        <h3 className="mb-0" style={{ fontSize: 14 }}>
+                          {d.workingWallet ?? '0.00'} ₹
+                        </h3>
+                        <h6 className="">Income Wallet </h6>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            </div>
+
+            <div className="col-md-6 col-lg-3">
+              <Link to="/walletOutstanding">
+                <div className="iq-card iq-card-block iq-card-stretch iq-card-height">
+                  <div className="iq-card-body iq-bg-warning rounded">
+                    <div className="d-flex align-items-center justify-content-between">
+                      <div className="rounded-circle iq-card-icon bg-warning">
+                        <span>&#36;</span>
+                      </div>
+                      <div className="text-right">
+                        <h3 className="mb-0" style={{ fontSize: 14 }}>
+                          {d.fundWallet ?? '0.00'} ₹
+                        </h3>
+                        <h6 className="">Purchase Wallet</h6>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            </div>
+          </div>
+        </div>
       </div>
-
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Link to="/viewMember" className="flex items-center justify-between rounded-2xl bg-primary/10 p-5">
-          <span className="flex size-15 items-center justify-center rounded-full text-xl bg-primary text-white">U</span>
-          <div className="text-right">
-            <h3 className="text-lg font-semibold">1280</h3>
-            <h6 className="text-sm">Total User</h6>
-          </div>
-        </Link>
-
-        <Link to="/viewActiveMember" className="flex items-center justify-between rounded-2xl bg-success/10 p-5">
-          <span className="flex size-15 items-center justify-center rounded-full text-xl bg-success text-white">U</span>
-          <div className="text-right">
-            <h3 className="text-lg font-semibold">420</h3>
-            <h6 className="text-sm">Active User</h6>
-          </div>
-        </Link>
-
-        <Link to="/viewInActiveMember" className="flex items-center justify-between rounded-2xl bg-danger/10 p-5">
-          <span className="flex size-15 items-center justify-center rounded-full text-xl bg-danger text-white">U</span>
-          <div className="text-right">
-            <h3 className="text-lg font-semibold">860</h3>
-            <h6 className="text-sm">In Active User</h6>
-          </div>
-        </Link>
-
-        <Link to="/activeIncomeUserMember" className="flex items-center justify-between rounded-2xl bg-primary/10 p-5">
-          <span className="flex size-15 items-center justify-center rounded-full text-xl bg-danger text-white">U</span>
-          <div className="text-right">
-            <h3 className="text-lg font-semibold">420</h3>
-            <h6 className="text-sm">Active Income User</h6>
-          </div>
-        </Link>
-
-        <Link to="/recharges" className="flex items-center justify-between rounded-2xl bg-success/10 p-5">
-          <span className="flex size-15 items-center justify-center rounded-full text-xl bg-success text-white">$</span>
-          <div className="text-right">
-            <h3 className="text-lg font-semibold">12500.00₹</h3>
-            <h6 className="text-sm">Pending Fund Requerst</h6>
-          </div>
-        </Link>
-
-        <Link to="/walletWithdrawStatus" className="flex items-center justify-between rounded-2xl bg-success/10 p-5">
-          <span className="flex size-15 items-center justify-center rounded-full text-xl bg-success text-white">$</span>
-          <div className="text-right">
-            <h3 className="text-lg font-semibold">98000.00₹</h3>
-            <h6 className="text-sm">Total Withdraw</h6>
-          </div>
-        </Link>
-
-        <Link to="/walletWithdrawStatus" className="flex items-center justify-between rounded-2xl bg-success/10 p-5">
-          <span className="flex size-15 items-center justify-center rounded-full text-xl bg-success text-white">$</span>
-          <div className="text-right">
-            <h3 className="text-lg font-semibold">4300.00₹</h3>
-            <h6 className="text-sm">Pending Withdrawal</h6>
-          </div>
-        </Link>
-
-        <Link to="/viewMember" className="flex items-center justify-between rounded-2xl bg-success/10 p-5">
-          <span className="flex size-15 items-center justify-center rounded-full text-xl bg-success text-white">$</span>
-          <div className="text-right">
-            <h3 className="text-lg font-semibold">152340.50 ₹</h3>
-            <h6 className="text-sm">Income Wallet</h6>
-          </div>
-        </Link>
-
-        <Link to="/walletOutstanding" className="flex items-center justify-between rounded-2xl bg-warning/10 p-5">
-          <span className="flex size-15 items-center justify-center rounded-full text-xl bg-warning text-white">$</span>
-          <div className="text-right">
-            <h3 className="text-lg font-semibold">87210.00 ₹</h3>
-            <h6 className="text-sm">Purchase Wallet</h6>
-          </div>
-        </Link>
-      </div>
-    </>
+    </div>
   )
 }

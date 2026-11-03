@@ -12,6 +12,8 @@ import { transfer } from "./transfer";
 import { transferAdmin } from "./transfer-admin";
 import { transferHistory } from "./transfer-history";
 import { walletDeductAdmin } from "./wallet-deduct-admin";
+import { getOnlineDeposits } from "./online-deposit-admin";
+import { getFundTransfers } from "./transfer-history-admin";
 
 export function fundRouter(app: FastifyInstance) {
   transferHistory(app);
@@ -31,4 +33,7 @@ export function fundRouter(app: FastifyInstance) {
 
   rechargeHistoryAdmin(app);
   rechargeResponseAdmin(app);
+
+  getOnlineDeposits(app);
+  getFundTransfers(app);
 }
